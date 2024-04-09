@@ -1,3 +1,6 @@
 flair
 presidio_analyzer
 spacy
+scipy
+presidio-analyzer[transformers]
+presidio-analyzer[stanza]
