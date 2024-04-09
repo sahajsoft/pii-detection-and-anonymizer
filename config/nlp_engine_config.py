@@ -11,6 +11,11 @@ class NLPEngineConfig:
 
 class FlairNLPEngine(NLPEngineConfig):
     def create_nlp_engine(self, model_path):
+        '''
+        Flair doesn't have an official NLP Engine. Hence making it as a Recognizer to presidio
+        :param model_path:
+        :return:
+        '''
         registry = RecognizerRegistry()
         registry.load_predefined_recognizers()
         if not spacy.util.is_package("en_core_web_sm"):
