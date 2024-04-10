@@ -5,12 +5,16 @@ import spacy
 
 
 class NLPEngineConfig:
-    def create_nlp_engine(self, model_path):
+
+    def __init__(self, model_path):
+        self.model_path = model_path
+
+    def create_nlp_engine(self):
         pass
 
 
 class FlairNLPEngine(NLPEngineConfig):
-    def create_nlp_engine(self, model_path):
+    def create_nlp_engine(self):
         '''
         Flair doesn't have an official NLP Engine. Hence making it as a Recognizer to presidio
         :param model_path:
@@ -20,7 +24,7 @@ class FlairNLPEngine(NLPEngineConfig):
         registry.load_predefined_recognizers()
         if not spacy.util.is_package("en_core_web_sm"):
             spacy.cli.download("en_core_web_sm")
-        flair_recognizer = FlairRecognizer(model_path=model_path)
+        flair_recognizer = FlairRecognizer(model_path=self.model_path)
         nlp_configuration = {
             "nlp_engine_name": "spacy",
             "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
