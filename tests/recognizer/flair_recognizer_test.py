@@ -5,7 +5,7 @@ from recognizer.flair_recognizer import FlairRecognizer
 
 class TestFlairRecognizer(unittest.TestCase):
     def setUp(self) -> None:
-        self.recognizer = FlairRecognizer()
+        self.recognizer = FlairRecognizer(model_path="flair/ner-english-large")
 
     def test_flair_recognizer_analyse(self):
         test_data = "Sowmya is working in Berkley bank as an accountant since 2021"
