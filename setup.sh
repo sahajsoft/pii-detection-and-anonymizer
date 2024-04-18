@@ -15,7 +15,7 @@ if command -v direnv >/dev/null; then
     echo "direnv is already installed on this system."
 else
     echo "Installing direnv"
-    nix-env -f '<nixpkgs>' -iA nix-direnv
+    nix-env -f '<nixpkgs>' -iA direnv nix-direnv
 fi
 
 direnv allow
