@@ -29,12 +29,21 @@
           default = self.packages.${system}.myapp;
         };
 
-        devShells.default = pkgs.mkShell {
-          packages = nativeBuildInputs ++ buildInputs;
-          LD_LIBRARY_PATH = if pkgs.stdenv.isLinux then
-            "${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib:${pkgs.libGL}/lib:/nix/store/2if9iy5cy0bicwafllpa2aiq30v26app-glib-2.78.1/lib"
-          else
-            "$LD_LIBRARY_PATH";
+        devShells = {
+          default = pkgs.mkShell {
+            packages = nativeBuildInputs ++ buildInputs;
+            LD_LIBRARY_PATH = if pkgs.stdenv.isLinux then
+              "${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib:${pkgs.libGL}/lib:/nix/store/2if9iy5cy0bicwafllpa2aiq30v26app-glib-2.78.1/lib"
+            else
+              "$LD_LIBRARY_PATH";
+          };
+          CI = pkgs.mkShell {
+            packages = nativeBuildInputs ++ buildInputs ++ [ pkgs.nodejs_20 ];
+            LD_LIBRARY_PATH = if pkgs.stdenv.isLinux then
+              "${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib:${pkgs.libGL}/lib:/nix/store/2if9iy5cy0bicwafllpa2aiq30v26app-glib-2.78.1/lib"
+            else
+              "$LD_LIBRARY_PATH";
+          };
         };
       });
 }
