@@ -1,4 +1,4 @@
-name: Test and Build
+name: "Test and Build"
 
 on: [push]
 
@@ -8,14 +8,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup
-      run: ./setup.sh
-      shell: bash
+    - name: "Setup env"
+      uses: JRMurr/direnv-nix-action@v4.1.0
 
-    - name: Install python dependencies
+    - name: "Install python dependencies"
       run: poetry install
       shell: bash
 
-    - name: Test
+    - name: "Test"
       run: poetry run python -m unittest tests/**.py
       shell: bash
