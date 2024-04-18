@@ -10,9 +10,12 @@ jobs:
 
     - name: Setup
       run: ./setup.sh
+      shell: bash
 
     - name: Install python dependencies
       run: poetry install
+      shell: bash
 
     - name: Test
       run: poetry run python -m unittest tests/**.py
+      shell: bash
