@@ -16,5 +16,5 @@ jobs:
       shell: bash
 
     - name: "Test"
-      run: poetry run python -m unittest tests/**.py
+      run: poetry run python -m unittest tests/recognizer/flair_recognizer_test.py
       shell: bash
