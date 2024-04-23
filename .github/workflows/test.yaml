@@ -14,8 +14,16 @@ jobs:
     - name: "Setup env"
       uses: JRMurr/direnv-nix-action@v4.1.0
 
+    - name: "Load cached venv"
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}-${{ hashFiles('**/poetry.lock') }}
+
     - name: "Install python dependencies"
-      run: poetry install
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
       shell: bash
 
     - name: "Test"
