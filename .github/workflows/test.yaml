@@ -28,5 +28,5 @@ jobs:
       shell: bash
 
     - name: "Test"
-      run: poetry run python -m unittest tests/recognizer/flair_recognizer_test.py
+      run: 'shopt -s globstar && poetry run python -m unittest tests/**/*.py'
       shell: bash
