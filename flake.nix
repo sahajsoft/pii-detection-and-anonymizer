@@ -11,7 +11,7 @@
   outputs = { self, nixpkgs, flake-utils, poetry2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        nativeBuildInputs = with pkgs; [ stdenv libgcc python3 poetry ];
+        nativeBuildInputs = with pkgs; [ stdenv python3 poetry ];
         buildInputs = with pkgs; [ ];
 
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
@@ -36,10 +36,6 @@
               "${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib"
             else
               "$LD_LIBRARY_PATH";
-          };
-          CI = pkgs.mkShell {
-            packages = nativeBuildInputs ++ buildInputs ++ [ pkgs.nodejs_20 ];
-            LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${pkgs.stdenv.cc.cc.lib}/lib";
           };
         };
       });
