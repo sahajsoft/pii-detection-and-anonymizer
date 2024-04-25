@@ -1,0 +1,32 @@
+name: "Test and Build"
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: "Setup poetry"
+      uses: abatilo/actions-poetry@v2
+
+    - name: "Load cached venv"
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: "Install python dependencies"
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+      shell: bash
+
+    - name: "Test"
+      run: 'shopt -s globstar && poetry run python -m unittest tests/**/*.py'
+      shell: bash
