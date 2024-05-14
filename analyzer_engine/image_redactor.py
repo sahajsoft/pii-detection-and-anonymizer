@@ -12,3 +12,4 @@ class ImageRedactor:
     def detect_pii(self):
         image = ImageUtil.open_image(self.image_file)
         redacted_image = self.engine.redact(image, (255, 192, 203))
+        return redacted_image
