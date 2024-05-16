@@ -8,6 +8,8 @@ Run `./setup.sh` to install all dependencies. This will install [direnv](https:/
 
 Alternatively, make sure you have [python 3.11](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation) setup on your machine.
 
+Also make sure tesseract is installed in the system. It is needed for detecting pii in images. Follow these steps to install tesseract [Tesseract installation](https://tesseract-ocr.github.io/tessdoc/Installation.html)
+
 ## Getting Started
 
 To get started, run the following:
@@ -26,3 +28,4 @@ To fix this, you need to run the nix commands directly. Run the following:
 nix --extra-experimental-features 'nix-command flakes' develop
 ```
 This command will create a new Shell instance which has the Nix dependencies loaded. You will need to run commands through this prompt.
+
