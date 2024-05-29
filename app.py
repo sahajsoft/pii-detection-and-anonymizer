@@ -31,36 +31,31 @@ class Server:
         @self.app.route("/analyze", methods=["POST"])
         def analyze() -> Tuple[str, int]:
             """Execute the analyzer function."""
-            # Parse the request params
             try:
-                req_json = request.get_json()
-                if not req_json.get("text"):
-                    raise Exception("No text provided")
+                file = request.files['file']
+                if file.filename == '':
+                    return jsonify({'error': 'No selected file'}), 400
 
-                if not req_json.get("language"):
-                    raise Exception("No language provided")
+                filepath = f'uploads/{file.filename}'
+                file.save(filepath)
+                self.logger.info(f"Successfully saved file: {filepath}")
 
-                recognizer_result_list = self.engine.analyze_text(
-                    text=req_json.get("text"),
-                    language=req_json.get("language")
+                analyzer_result_list = self.engine.analyze_csv(
+                    csv_full_path=filepath,
+                    language="en"
                 )
 
-                return Response(
-                    json.dumps(
-                        recognizer_result_list,
+                resp = {}
+                for result in analyzer_result_list:
+                    resp['key'] = result.key
+                    resp['value'] = result.value
+                    resp['recognizer_results'] = json.dumps(
+                        result.recognizer_results,
                         default=lambda o: o.to_dict(),
                         sort_keys=True,
-                    ),
-                    content_type="application/json",
-                )
-            except TypeError as te:
-                error_msg = (
-                    f"Failed to parse /analyze request "
-                    f"for AnalyzerEngine.analyze(). {te.args[0]}"
-                )
-                self.logger.error(error_msg)
-                return jsonify(error=error_msg), 400
+                    )
 
+                return jsonify(resp), 200
             except Exception as e:
                 self.logger.error(
                     f"A fatal error occurred during execution of "
