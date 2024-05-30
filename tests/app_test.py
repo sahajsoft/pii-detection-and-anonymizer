@@ -22,12 +22,28 @@ def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
 
+def test_analyze_non_existent(client):
+    response = client.post("/analyze", data={
+        "language": "en",
+    })
 
-def test_analyze_csv_file(client):
+    assert response.status_code == 500
+
+
+def test_analyze_invalid_csv(client):
+    response = client.post("/analyze", data={
+        "file": open('./tests/sample_data/invalid.csv', 'rb'),
+    })
+
+    assert response.status_code == 500
+
+
+def test_analyze_pii_csv(client):
     expected_response_id = {'value': ['1', '2', '3'], 'recognizer_results': [[], [], []]}
 
     response = client.post("/analyze", data={
-        "file": open('./tests/analyzer_engine/sample_data.csv', 'rb'),
+        "file": open('./tests/sample_data/sample_data.csv', 'rb'),
+        "language": "en",
     })
 
     assert response.status_code == 200

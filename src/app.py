@@ -37,6 +37,7 @@ class Server:
             """Execute the analyzer function."""
             try:
                 file = request.files['file']
+                language = request.form['language']
                 if file.filename == '':
                     return jsonify({'error': 'No selected file'}), 400
 
@@ -46,7 +47,7 @@ class Server:
 
                 analyzer_results = self.engine.analyze_csv(
                     csv_full_path=filepath,
-                    language="en"
+                    language=language
                 )
                 self.logger.debug(f"Analyzed file with results: {analyzer_results}")
                 os.remove(filepath)
