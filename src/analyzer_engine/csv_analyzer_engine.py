@@ -29,3 +29,16 @@ class CSVAnalyzerEngine(BatchAnalyzerEngine):
             csv_dict = {header: list(map(str, values)) for header, *values in zip(*csv_list)}
             analyzer_results = self.analyze_dict(csv_dict, language, keys_to_skip)
             return list(analyzer_results)
+
+    def analyze_text(
+            self,
+            text: str,
+            language: str,
+            keys_to_skip: Optional[List[str]] = None,
+            **kwargs,
+    ) -> Iterable[DictAnalyzerResult]:
+        d = text.split('\\n')
+        csv_list = csv.DictReader(d)
+        csv_dict = {header: list(map(str, values)) for header, *values in zip(*csv_list)}
+        analyzer_results = self.analyze_dict(csv_dict, language, keys_to_skip)
+        return list(analyzer_results)
