@@ -11,6 +11,7 @@ from config.nlp_engine_config import FlairNLPEngine
 
 DEFAULT_PORT = "3000"
 NLP_ENGINE = "flair/ner-english-large"
+UPLOAD_DIR = "./file_uploads"
 
 class Server:
     """HTTP Server for calling Presidio Analyzer."""
@@ -23,6 +24,8 @@ class Server:
         nlp_engine = FlairNLPEngine(NLP_ENGINE)
         self.engine = CSVAnalyzerEngine(nlp_engine)
         self.logger.info("Started analyzer engine")
+        if not os.path.exists(UPLOAD_DIR):
+            os.makedirs(UPLOAD_DIR)
 
         @self.app.route("/health")
         def health() -> str:
@@ -37,7 +40,7 @@ class Server:
                 if file.filename == '':
                     return jsonify({'error': 'No selected file'}), 400
 
-                filepath = f'uploads/{uuid.uuid4()}'
+                filepath = f'{UPLOAD_DIR}/{uuid.uuid4()}'
                 file.save(filepath)
                 self.logger.info(f"Successfully saved file: {filepath}")
 
