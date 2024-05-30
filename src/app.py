@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import uuid
 from typing import Tuple
 
 from flask import Flask, request, jsonify, Response
@@ -36,26 +37,29 @@ class Server:
                 if file.filename == '':
                     return jsonify({'error': 'No selected file'}), 400
 
-                filepath = f'uploads/{file.filename}'
+                filepath = f'uploads/{uuid.uuid4()}'
                 file.save(filepath)
                 self.logger.info(f"Successfully saved file: {filepath}")
 
-                analyzer_result_list = self.engine.analyze_csv(
+                analyzer_results = self.engine.analyze_csv(
                     csv_full_path=filepath,
                     language="en"
                 )
+                self.logger.debug(f"Analyzed file with results: {analyzer_results}")
+                os.remove(filepath)
+                self.logger.info(f"Successfully removed file: {filepath}")
 
-                resp = {}
-                for result in analyzer_result_list:
-                    resp['key'] = result.key
-                    resp['value'] = result.value
-                    resp['recognizer_results'] = json.dumps(
-                        result.recognizer_results,
-                        default=lambda o: o.to_dict(),
-                        sort_keys=True,
-                    )
+                analyzer_results_dict = {}
+                for a in analyzer_results:
+                    recognizer_results = []
+                    for r in a.recognizer_results:
+                        recognizer_results.append([o.to_dict() for o in r])
+                    analyzer_results_dict[a.key] = {
+                        "value": a.value,
+                        "recognizer_results": recognizer_results
+                    }
 
-                return jsonify(resp), 200
+                return jsonify(analyzer_results_dict), 200
             except Exception as e:
                 self.logger.error(
                     f"A fatal error occurred during execution of "

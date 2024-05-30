@@ -28,4 +28,4 @@ class CSVAnalyzerEngine(BatchAnalyzerEngine):
             csv_list = list(csv.reader(csv_file))
             csv_dict = {header: list(map(str, values)) for header, *values in zip(*csv_list)}
             analyzer_results = self.analyze_dict(csv_dict, language, keys_to_skip)
-            return analyzer_results
+            return list(analyzer_results)
