@@ -4,14 +4,17 @@ import os
 import uuid
 from typing import Tuple
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_file
 
+import csv
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
+from presidio_analyzer import DictAnalyzerResult, RecognizerResult
+from presidio_anonymizer import BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 
 DEFAULT_PORT = "3000"
 NLP_ENGINE = "flair/ner-english-large"
-UPLOAD_DIR = "./file_uploads"
+UPLOAD_DIR = "file_uploads"
 
 class Server:
     """HTTP Server for calling Presidio Analyzer."""
@@ -53,21 +56,68 @@ class Server:
                 os.remove(filepath)
                 self.logger.info(f"Successfully removed file: {filepath}")
 
-                analyzer_results_dict = {}
+                analyzer_results_list = {}
                 for a in analyzer_results:
                     recognizer_results = []
                     for r in a.recognizer_results:
                         recognizer_results.append([o.to_dict() for o in r])
-                    analyzer_results_dict[a.key] = {
+                    analyzer_results_list[a.key] = {
                         "value": a.value,
                         "recognizer_results": recognizer_results
                     }
 
-                return jsonify(analyzer_results_dict), 200
+                return jsonify(analyzer_results_list), 200
             except Exception as e:
                 self.logger.error(
                     f"A fatal error occurred during execution of "
                     f"AnalyzerEngine.analyze(). {e}"
+                )
+                return jsonify(error=e.args[0]), 500
+
+        @self.app.route("/anonymize", methods=["POST"])
+        def anonymize() -> Response:
+            """Execute the anonymizer function."""
+            try:
+                analyzer_results = json.loads(request.form['analyzer_results'])
+                dict_analyzer_results = []
+                for key, value in analyzer_results.items():
+                    recognizer_results = []
+                    for results_for_each_entry in value["recognizer_results"]:
+                        each_entry_recognizer_results = []
+                        for r in results_for_each_entry:
+                            each_entry_recognizer_results.append(
+                                RecognizerResult(r["entity_type"],
+                                                r["start"],
+                                                r["end"],
+                                                r["score"]))
+                        recognizer_results.append(each_entry_recognizer_results)
+                    dict_analyzer_results.append(DictAnalyzerResult(key=key, value=value["value"], recognizer_results=recognizer_results))
+
+                anonymizer = BatchAnonymizerEngine()
+                anonymized_results = anonymizer.anonymize_dict(dict_analyzer_results)
+
+                data = []
+                keys = anonymized_results.keys()
+                for i in range(len(anonymized_results[list(keys)[0]])):
+                    row = {key: anonymized_results[key][i] for key in keys}
+                    data.append(row)
+
+                filename = f'{UPLOAD_DIR}/{uuid.uuid4()}.csv'
+                with open(filename, 'w', newline='') as output:
+                    writer = csv.DictWriter(output, fieldnames=keys)
+                    writer.writeheader()
+                    writer.writerows(data)
+
+                return send_file(
+                    filename,
+                    mimetype='text/csv',
+                    as_attachment=True,
+                    download_name='anonymized_data.csv'
+                )
+            except Exception as e:
+                self.logger.error(
+                    f"A fatal error occurred during execution of "
+                    f"AnonymizerEngine.anonymize(). {e}"
                 )
                 return jsonify(error=e.args[0]), 500
 

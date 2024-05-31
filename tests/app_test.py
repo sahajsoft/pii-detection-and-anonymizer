@@ -56,3 +56,21 @@ def test_analyze_pii_csv(client):
     assert data['comments']['recognizer_results'][1][0]['entity_type'] == 'US_DRIVER_LICENSE'
     assert data['comments']['recognizer_results'][1][0]['start'] == 34
     assert data['comments']['recognizer_results'][1][0]['end'] == 42
+
+def test_anonymize_csv_pii(client):
+    analyze_response = client.post("/analyze", data={
+        "file": open('./tests/sample_data/sample_data.csv', 'rb'),
+        "language": "en",
+    })
+
+    assert analyze_response.status_code == 200
+    analyzer_results = analyze_response.get_data(as_text=True)
+
+    anonymizer_response = client.post("/anonymize", data={
+        "file": open('./tests/sample_data/sample_data.csv', 'rb'),
+        "analyzer_results": analyzer_results
+    })
+
+    assert anonymizer_response.status_code == 200
+    anonymizer_data = json.loads(anonymizer_response.get_data(as_text=True))
+    assert anonymizer_response
