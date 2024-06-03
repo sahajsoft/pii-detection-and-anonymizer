@@ -28,5 +28,5 @@ jobs:
       shell: bash
 
     - name: "Test"
-      run: 'shopt -s globstar && poetry run python -m unittest tests/**/*.py'
+      run: 'poetry run pytest'
       shell: bash

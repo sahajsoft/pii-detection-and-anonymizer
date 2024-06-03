@@ -13,8 +13,15 @@ spacy = "^3.7.4"
 scipy = "<1.13.0"
 presidio-anonymizer = "^2.2.354"
 presidio-analyzer = {version = "^2.2.354", extras = ["transformers", "stanza"]}
+pytest = "^8.2.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
+]
