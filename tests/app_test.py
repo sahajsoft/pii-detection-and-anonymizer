@@ -72,5 +72,5 @@ def test_anonymize_csv_pii(client):
     })
 
     assert anonymizer_response.status_code == 200
-    anonymizer_data = json.loads(anonymizer_response.get_data(as_text=True))
-    assert anonymizer_response
+    anonymizer_data = anonymizer_response.get_data(as_text=True)
+    assert anonymizer_data

@@ -109,7 +109,7 @@ class Server:
                     writer.writerows(data)
 
                 return send_file(
-                    filename,
+                    os.path.abspath(filename),
                     mimetype='text/csv',
                     as_attachment=True,
                     download_name='anonymized_data.csv'
