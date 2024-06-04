@@ -12,6 +12,10 @@ jobs:
       with:
         python-version: "3.11"
 
+    - name: "Install Tesseract"
+      run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+      shell: bash
+
     - name: "Setup poetry"
       uses: abatilo/actions-poetry@v2
 
