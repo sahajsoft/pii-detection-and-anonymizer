@@ -1,0 +1,73 @@
+{
+	"info": {
+		"_postman_id": "982c5e72-213c-44f9-9c98-ac336ee0fe36",
+		"name": "PII detection & Anonymizer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35347313"
+	},
+	"item": [
+		{
+			"name": "Analyse",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/home/akshaykarle/src/github.com/sahajsoft/pii-detection-and-anonymizer/tests/sample_data/sample_data.csv"
+						},
+						{
+							"key": "language",
+							"value": "en",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/analyze",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"analyze"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Anonymize",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "analyzer_results",
+							"value": "{\n    \"city\": {\n        \"recognizer_results\": [\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 8,\n                    \"entity_type\": \"LOCATION\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 0.99,\n                    \"start\": 0\n                }\n            ],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 11,\n                    \"entity_type\": \"ORGANIZATION\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 1.0,\n                    \"start\": 0\n                }\n            ],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 7,\n                    \"entity_type\": \"ORGANIZATION\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 1.0,\n                    \"start\": 0\n                }\n            ]\n        ],\n        \"value\": [\n            \"New York\",\n            \"Los Angeles\",\n            \"Chicago\"\n        ]\n    },\n    \"comments\": {\n        \"recognizer_results\": [\n            [],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 42,\n                    \"entity_type\": \"US_DRIVER_LICENSE\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"UsLicenseRecognizer_140195803164112\",\n                        \"recognizer_name\": \"UsLicenseRecognizer\"\n                    },\n                    \"score\": 0.6499999999999999,\n                    \"start\": 34\n                }\n            ],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 45,\n                    \"entity_type\": \"PHONE_NUMBER\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"PhoneRecognizer_140195794152912\",\n                        \"recognizer_name\": \"PhoneRecognizer\"\n                    },\n                    \"score\": 0.75,\n                    \"start\": 33\n                }\n            ]\n        ],\n        \"value\": [\n            \"called him yesterday to confirm he requested to call back in 2 days\",\n            \"accepted the offer license number AC432223\",\n            \"need to call him at phone number 212-555-5555\"\n        ]\n    },\n    \"id\": {\n        \"recognizer_results\": [\n            [],\n            [],\n            []\n        ],\n        \"value\": [\n            \"1\",\n            \"2\",\n            \"3\"\n        ]\n    },\n    \"name\": {\n        \"recognizer_results\": [\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 6,\n                    \"entity_type\": \"PERSON\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 1.0,\n                    \"start\": 0\n                }\n            ],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 4,\n                    \"entity_type\": \"PERSON\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 0.99,\n                    \"start\": 0\n                }\n            ],\n            [\n                {\n                    \"analysis_explanation\": null,\n                    \"end\": 4,\n                    \"entity_type\": \"PERSON\",\n                    \"recognition_metadata\": {\n                        \"recognizer_identifier\": \"Flair Analytics_140196554122768\",\n                        \"recognizer_name\": \"Flair Analytics\"\n                    },\n                    \"score\": 0.93,\n                    \"start\": 0\n                }\n            ]\n        ],\n        \"value\": [\n            \"Sowmya\",\n            \"Jill\",\n            \"Jack\"\n        ]\n    }\n}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/anonymize",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"anonymize"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
