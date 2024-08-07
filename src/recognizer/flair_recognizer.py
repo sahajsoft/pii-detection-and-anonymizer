@@ -4,6 +4,7 @@ Referred from
 2. https://huggingface.co/spaces/presidio/presidio_demo/blob/main/flair_recognizer.py
 
 '''
+import logging
 from typing import Optional, List, Tuple, Set
 
 from presidio_analyzer import (
@@ -62,10 +63,10 @@ class FlairRecognizer(EntityRecognizer):
         elif model and not model_path:
             self.model = model
         elif not model and model_path:
-            print(f"Loading model from {model_path}")
+            logging.info(f"Loading model from {model_path}")
             self.model = SequenceTagger.load(model_path)
         else:
-            print(f"Loading model for language {supported_language}")
+            logging.info(f"Loading model for language {supported_language}")
             self.model = SequenceTagger.load(
                 self.MODEL_LANGUAGES.get(supported_language)
             )
