@@ -1,5 +1,4 @@
 import argparse
-import pprint
 from presidio_analyzer.analyzer_engine import AnalyzerEngine
 from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
