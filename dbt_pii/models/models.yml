@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: pii_info
+    description: Fact table for orders including customer and cohort dimensions.
+    columns:
+      - name: id
+      - name: name
+      - name: city
+      - name: comments
+      - name: pii
