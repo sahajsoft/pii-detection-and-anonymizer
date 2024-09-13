@@ -11,7 +11,7 @@
   outputs = { self, nixpkgs, flake-utils, poetry2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        nativeBuildInputs = with pkgs; [ stdenv python3 poetry tesseract ];
+        nativeBuildInputs = with pkgs; [ stdenv python311 poetry tesseract ];
         buildInputs = with pkgs; [ ];
 
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
@@ -24,7 +24,7 @@
         packages = {
           myapp = mkPoetryApplication {
             projectDir = self;
-            python = pkgs.python3;
+            python = pkgs.python311;
           };
           default = self.packages.${system}.myapp;
         };
