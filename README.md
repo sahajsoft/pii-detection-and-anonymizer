@@ -13,8 +13,8 @@ Alternatively, make sure you have [python 3.11](https://www.python.org/downloads
 To get started, run the following:
 
 ```
-poetry install
-poetry run python -m unittest tests/**.py
+poetry install --no-interaction --no-root
+poetry run pytest
 ```
 
 ## Troubleshooting
