@@ -16,7 +16,7 @@
           config.allowUnfree = true; # needed for vault
         };
         nativeBuildInputs = with pkgs; [ stdenv python311 poetry tesseract ];
-        buildInputs = with pkgs; [ vault ];
+        buildInputs = with pkgs; [ vault jq ];
 
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
         inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; })
