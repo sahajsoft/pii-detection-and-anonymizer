@@ -11,11 +11,14 @@
   outputs = { self, nixpkgs, flake-utils, poetry2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true; # needed for vault
+        };
         nativeBuildInputs = with pkgs; [ stdenv python311 poetry tesseract ];
-        buildInputs = with pkgs; [ ];
+        buildInputs = with pkgs; [ vault ];
 
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
-        pkgs = nixpkgs.legacyPackages.${system};
         inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; })
           mkPoetryApplication;
       in {
