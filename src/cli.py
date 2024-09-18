@@ -1,7 +1,6 @@
 import argparse
-from presidio_analyzer.analyzer_engine import AnalyzerEngine
-from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
+from text.text import text_analyzer, text_anonymizer
 from presidio_anonymizer import BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 
@@ -9,18 +8,12 @@ NLP_ENGINE = "flair/ner-english-large"
 
 
 def analyze(args):
-    nlp_engine = FlairNLPEngine(NLP_ENGINE)
     analyzer_results = None
 
     if args.text:
-        nlp_engine, registry = nlp_engine.create_nlp_engine()
-        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
-
-        analyzer_results = engine.analyze(
-            text=args.text,
-            language=args.language
-        )
+        analyzer_results = text_analyzer(args.text, args.language)
     else:
+        nlp_engine = FlairNLPEngine(NLP_ENGINE)
         engine = CSVAnalyzerEngine(nlp_engine)
 
         analyzer_results = engine.analyze_csv(
@@ -37,8 +30,7 @@ def anonymize(args):
     anonymized_results = None
 
     if args.text:
-        anonymizer = AnonymizerEngine()
-        anonymized_results = anonymizer.anonymize(args.text, analyzer_results)
+        anonymized_results = text_anonymizer(args.text, analyzer_results)
     else:
         anonymizer = BatchAnonymizerEngine()
         anonymized_results = anonymizer.anonymize_dict(analyzer_results)
@@ -69,3 +61,17 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# vault test:
+from presidio_anonymizer.entities import OperatorConfig
+def vault_encrypt(text):
+    return text + "x"
+
+operators = {"DEFAULT": OperatorConfig("custom", {"lambda": vault_encrypt})}
+
+t = "Hi my name is Qwerty and I live in London. My number is 07440 123456."
+res = text_analyzer(t, "en")
+anon_res = text_anonymizer(t, res, operators)
+
+print(anon_res)
