@@ -15,7 +15,13 @@
           inherit system;
           config.allowUnfree = true; # needed for vault
         };
-        nativeBuildInputs = with pkgs; [ stdenv python311 poetry tesseract ];
+        nativeBuildInputs = with pkgs; [
+          stdenv
+          python311
+          poetry
+          zlib
+          tesseract
+        ];
         buildInputs = with pkgs; [ vault jq ];
 
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
@@ -36,7 +42,9 @@
           default = pkgs.mkShell {
             packages = nativeBuildInputs ++ buildInputs;
             LD_LIBRARY_PATH = if pkgs.stdenv.isLinux then
-              "${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib"
+              "${
+                pkgs.lib.makeLibraryPath nativeBuildInputs
+              }:${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib"
             else
               "$LD_LIBRARY_PATH";
           };
