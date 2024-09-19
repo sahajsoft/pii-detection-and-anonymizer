@@ -4,6 +4,8 @@ import base64
 import hvac
 import sys
 
+VAULT_URL = "http://127.0.0.1:8200"
+
 
 def base64ify(bytes_or_str):
     """Helper method to perform base64 encoding across Python 2.7 and Python 3.X"""
@@ -15,7 +17,6 @@ def base64ify(bytes_or_str):
     output_bytes = base64.urlsafe_b64encode(input_bytes)
     return output_bytes.decode('ascii')
 
-VAULT_URL = "https://127.0.0.1:8200"
 
 def vault_encrypt(text):
     print(f'plaintext is: {text} and {text.__class__}')
