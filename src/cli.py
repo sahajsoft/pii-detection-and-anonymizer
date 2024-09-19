@@ -79,7 +79,7 @@ if __name__ == '__main__':
 # print("Anonymize:")
 # anonymizer = AnonymizerEngine()
 # anonymizer.add_anonymizer(VaultEncrypt)
-# operators = {"DEFAULT": OperatorConfig("vault_encrypt", {"vault_url": VAULT_URL})}
+# operators = {"DEFAULT": OperatorConfig("vault_encrypt", {"vault_url": VAULT_URL, "key": "orders"})}
 # anon_res = anonymizer.anonymize(t, res, operators)
 # print(anon_res.text)
 
@@ -87,6 +87,6 @@ if __name__ == '__main__':
 # print("Deanonymize:")
 # deanonymizer = DeanonymizeEngine()
 # deanonymizer.add_deanonymizer(VaultDecrypt)
-# de_ops = {"DEFAULT": OperatorConfig("vault_decrypt", {"vault_url": VAULT_URL})}
+# de_ops = {"DEFAULT": OperatorConfig("vault_decrypt", {"vault_url": VAULT_URL, "key": "orders"})}
 # deanon_res = deanonymizer.deanonymize(anon_res.text, anon_res.items, de_ops)
 # print(deanon_res.text)

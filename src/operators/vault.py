@@ -19,14 +19,15 @@ class VaultEncrypt(Operator):
 
     def operate(self, text: str, params: Dict = None) -> str:
         vault_url = params.get("vault_url")
-        client = hvac.Client(url=vault_url)
+        key = params.get("key")
 
+        client = hvac.Client(url=vault_url)
         encrypt_data_response = client.secrets.transit.encrypt_data(
-            name='orders',
+            name=key,
             plaintext=self._base64ify(text),
         )
-
         ciphertext = encrypt_data_response['data']['ciphertext']
+
         return ciphertext
 
     def validate(self, params: Dict = None) -> None:
@@ -40,6 +41,12 @@ class VaultEncrypt(Operator):
         else:
             raise InvalidParamException(f"Invalid input, vault_url must be a string.")
 
+        key = params.get("key")
+        if isinstance(key, str) and key:
+            pass
+        else:
+            raise InvalidParamException(f"Invalid input, key must be a valid encryption key name.")
+
     def operator_name(self) -> str:
         return "vault_encrypt"
 
@@ -51,15 +58,16 @@ class VaultEncrypt(Operator):
 class VaultDecrypt(Operator):
     def operate(self, text: str, params: Dict = None) -> str:
         vault_url = params.get("vault_url")
-        client = hvac.Client(url=vault_url)
+        key = params.get("key")
 
+        client = hvac.Client(url=vault_url)
         decrypt_data_response = client.secrets.transit.decrypt_data(
-            name='orders',
+            name=key,
             ciphertext=text,
         )
-
         encodedtext = decrypt_data_response['data']['plaintext']
         plaintext = base64.b64decode(encodedtext).decode('utf8')
+
         return plaintext
 
     def validate(self, params: Dict = None) -> None:
@@ -72,6 +80,12 @@ class VaultDecrypt(Operator):
                 raise InvalidParamException(f"Invalid input, vault_url must be a valid URL.")
         else:
             raise InvalidParamException(f"Invalid input, vault_url must be a string.")
+
+        key = params.get("key")
+        if isinstance(key, str) and key:
+            pass
+        else:
+            raise InvalidParamException(f"Invalid input, key must be a valid encryption key name.")
 
     def operator_name(self) -> str:
         return "vault_decrypt"
