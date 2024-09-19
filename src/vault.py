@@ -18,27 +18,33 @@ def base64ify(bytes_or_str):
     return output_bytes.decode('ascii')
 
 
-def vault_encrypt(text):
-    print(f'plaintext is: {text} and {text.__class__}')
-    print(f'b64 plaintext is: {base64.b64encode(text.encode())}')
+def vault_encrypt(plaintext):
     client = hvac.Client(url=VAULT_URL)
 
     encrypt_data_response = client.secrets.transit.encrypt_data(
         name='orders',
-        plaintext=base64ify(text.encode()),
+        plaintext=base64ify(plaintext),
     )
-    print(f"Response: {encrypt_data_response}")
 
     ciphertext = encrypt_data_response['data']['ciphertext']
-    print(f'Encrypted plaintext ciphertext is: {ciphertext}')
     return ciphertext
 
 
-vault_encrypt("PII")
+def vault_decrypt(ciphertext):
+    client = hvac.Client(url=VAULT_URL)
 
-# operators = {"DEFAULT": OperatorConfig("custom", {"lambda": vault_encrypt})}
-# t = "Hi my name is Qwerty and I live in London. My number is 07440 123456."
-# res = text_analyzer(t, "en")
-# anon_res = text_anonymizer(t, res, operators)
+    decrypt_data_response = client.secrets.transit.decrypt_data(
+        name='orders',
+        ciphertext=ciphertext,
+    )
 
-# print(anon_res)
+    encodedtext = decrypt_data_response['data']['plaintext']
+    plaintext = base64.b64decode(encodedtext).decode('utf8')
+    return plaintext
+
+operators = {"DEFAULT": OperatorConfig("custom", {"lambda": vault_encrypt})}
+t = "Hi my name is Qwerty and I live in London. My number is 07440 123456."
+res = text_analyzer(t, "en")
+anon_res = text_anonymizer(t, res, operators)
+
+print(anon_res)
