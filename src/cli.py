@@ -66,6 +66,7 @@ if __name__ == '__main__':
 # vault test:
 
 # VAULT_URL = "http://127.0.0.1:8200"
+# VAULT_KEY = "orders"
 # from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
 # from presidio_anonymizer.deanonymize_engine import DeanonymizeEngine
 # from presidio_anonymizer.entities import OperatorConfig
@@ -79,7 +80,7 @@ if __name__ == '__main__':
 # print("Anonymize:")
 # anonymizer = AnonymizerEngine()
 # anonymizer.add_anonymizer(VaultEncrypt)
-# operators = {"DEFAULT": OperatorConfig("vault_encrypt", {"vault_url": VAULT_URL, "key": "orders"})}
+# operators = {"DEFAULT": OperatorConfig("vault_encrypt", {"vault_url": VAULT_URL, "key": VAULT_KEY})}
 # anon_res = anonymizer.anonymize(t, res, operators)
 # print(anon_res.text)
 
@@ -87,6 +88,6 @@ if __name__ == '__main__':
 # print("Deanonymize:")
 # deanonymizer = DeanonymizeEngine()
 # deanonymizer.add_deanonymizer(VaultDecrypt)
-# de_ops = {"DEFAULT": OperatorConfig("vault_decrypt", {"vault_url": VAULT_URL, "key": "orders"})}
+# de_ops = {"DEFAULT": OperatorConfig("vault_decrypt", {"vault_url": VAULT_URL, "key": VAULT_KEY})}
 # deanon_res = deanonymizer.deanonymize(anon_res.text, anon_res.items, de_ops)
 # print(deanon_res.text)

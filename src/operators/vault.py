@@ -22,6 +22,8 @@ class VaultEncrypt(Operator):
         key = params.get("key")
 
         client = hvac.Client(url=vault_url)
+        if params.get("vault_token"):
+            client.token = params.get("vault_token")
         encrypt_data_response = client.secrets.transit.encrypt_data(
             name=key,
             plaintext=self._base64ify(text),
@@ -61,6 +63,8 @@ class VaultDecrypt(Operator):
         key = params.get("key")
 
         client = hvac.Client(url=vault_url)
+        if params.get("vault_token"):
+            client.token = params.get("vault_token")
         decrypt_data_response = client.secrets.transit.decrypt_data(
             name=key,
             ciphertext=text,
