@@ -92,26 +92,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# vault test:
-
-# from text.text import text_analyzer
-# from operators.vault import Vault
-
-# vault_config = {"url": "http://127.0.0.1:8200", "token": "", "key": "orders"}
-# vault = Vault(vault_config['url'], vault_config['key'], vault_config['token'])
-
-# print("Analyze:")
-# t = "Hi my name is Qwerty and I live in London. My number is 07440 123456."
-# res = text_analyzer(t, "en")
-# print(res)
-
-# print("Anonymize:")
-# anon_res = vault.anonymize(t, res)
-# print(anon_res.text)
-# print(anon_res.items)
-
-# print("Deanonymize:")
-# deanon_res = vault.deanonymize(anon_res.text, anon_res.items)
-# print(deanon_res.text)
