@@ -1,9 +1,12 @@
 import base64
-from typing import Dict
+from typing import Dict, List
 from urllib.parse import urlparse
 
 import hvac
-from presidio_anonymizer.entities import InvalidParamException
+from presidio_anonymizer import ConflictResolutionStrategy, OperatorResult
+from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
+from presidio_anonymizer.deanonymize_engine import DeanonymizeEngine
+from presidio_anonymizer.entities import OperatorConfig, InvalidParamException, RecognizerResult
 from presidio_anonymizer.operators import Operator, OperatorType
 
 
@@ -96,3 +99,24 @@ class VaultDecrypt(Operator):
 
     def operator_type(self) -> OperatorType:
         return OperatorType.Deanonymize
+
+
+class Vault:
+    def __init__(self, vault_url: str, vault_key: str, vault_token: str = None) -> None:
+        self.vault_config = {
+            "vault_url": vault_url,
+            "key": vault_key,
+            "vault_token": vault_token
+        }
+
+    def anonymize(self, text: str, analyzer_results: List[RecognizerResult], conflict_resolution: ConflictResolutionStrategy = None):
+        anonymizer = AnonymizerEngine()
+        anonymizer.add_anonymizer(VaultEncrypt)
+        operators = {"DEFAULT": OperatorConfig("vault_encrypt", self.vault_config)}
+        return anonymizer.anonymize(text, analyzer_results, operators, conflict_resolution)
+
+    def deanonymize(self, text: str, anonymizer_result_items: List[OperatorResult]):
+        deanonymizer = DeanonymizeEngine()
+        deanonymizer.add_deanonymizer(VaultDecrypt)
+        operators = {"DEFAULT": OperatorConfig("vault_decrypt", self.vault_config)}
+        return deanonymizer.deanonymize(text, anonymizer_result_items, operators)

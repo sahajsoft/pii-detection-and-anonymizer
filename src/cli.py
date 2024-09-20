@@ -65,29 +65,21 @@ if __name__ == '__main__':
 
 # vault test:
 
-# VAULT_URL = "http://127.0.0.1:8200"
-# VAULT_KEY = "orders"
-# from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
-# from presidio_anonymizer.deanonymize_engine import DeanonymizeEngine
-# from presidio_anonymizer.entities import OperatorConfig
 # from text.text import text_analyzer
-# from operators.vault import VaultEncrypt, VaultDecrypt
+# from operators.vault import Vault
+
+# vault_config = {"url": "http://127.0.0.1:8200", "token": "", "key": "orders"}
+# vault = Vault(vault_config['url'], vault_config['key'], vault_config['token'])
+
 # print("Analyze:")
 # t = "Hi my name is Qwerty and I live in London. My number is 07440 123456."
 # res = text_analyzer(t, "en")
 # print(res)
 
 # print("Anonymize:")
-# anonymizer = AnonymizerEngine()
-# anonymizer.add_anonymizer(VaultEncrypt)
-# operators = {"DEFAULT": OperatorConfig("vault_encrypt", {"vault_url": VAULT_URL, "key": VAULT_KEY})}
-# anon_res = anonymizer.anonymize(t, res, operators)
+# anon_res = vault.anonymize(t, res)
 # print(anon_res.text)
 
-
 # print("Deanonymize:")
-# deanonymizer = DeanonymizeEngine()
-# deanonymizer.add_deanonymizer(VaultDecrypt)
-# de_ops = {"DEFAULT": OperatorConfig("vault_decrypt", {"vault_url": VAULT_URL, "key": VAULT_KEY})}
-# deanon_res = deanonymizer.deanonymize(anon_res.text, anon_res.items, de_ops)
+# deanon_res = vault.deanonymize(anon_res.text, anon_res.items)
 # print(deanon_res.text)
