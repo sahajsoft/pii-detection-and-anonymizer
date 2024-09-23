@@ -1,6 +1,6 @@
 # PII Detection and Anonymiser
 
-This is a service that helps you detect and anonymise PII.
+This is a python app to detect and anonymise PII data using Named Entity Recognition with Flair-based Embeddings built on top of [Presidio](https://github.com/microsoft/presidio/tree/main).
 
 ## Prerequisites
 
@@ -17,13 +17,27 @@ poetry install --no-interaction --no-root
 poetry run pytest
 ```
 
-To test the cli, run the following:
+### Demo
+
+You can run this as an api or using the cli. You can find the [API demo here](https://www.loom.com/share/ad8b37451ea54dcda8716cb5c6f11e94).
+
+You can run the API using the following command:
 ```
+poetry run python src/app.py
+```
+
+To run the cli locally, run any of the following commands:
+```
+# simple text analyze and anonymize
 poetry run python src/cli.py analyze --text "My name is Don Stark and my phone number is 212-555-5555"
 poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
+
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
 poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555" --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
+
+# help
+poetry run python src/cli.py --help
 ```
 
 ## Troubleshooting
