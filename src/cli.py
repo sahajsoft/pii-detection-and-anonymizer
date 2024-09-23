@@ -42,7 +42,7 @@ def anonymize(args):
         anonymizer = BatchAnonymizerEngine()
         anonymized_results = anonymizer.anonymize_dict(analyzer_results)
 
-    print(anonymized_results)
+    print(anonymized_results.to_json())
     return anonymized_results
 
 
@@ -55,7 +55,7 @@ def deanonymize(args):
 
     deanonymized_result = vault.deanonymize(args.text, anonymized_results)
 
-    print(deanonymized_result)
+    print(deanonymized_result.to_json())
     return deanonymized_result
 
 
