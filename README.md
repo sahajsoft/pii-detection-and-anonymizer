@@ -17,6 +17,15 @@ poetry install --no-interaction --no-root
 poetry run pytest
 ```
 
+To test the cli, run the following:
+```
+poetry run python src/cli.py analyze --text "My name is Don Stark and my phone number is 212-555-5555"
+poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
+# vault integration
+./vault.sh # start and configure vault server and transit secret engine keys
+poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555" --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
+```
+
 ## Troubleshooting
 
 There is a chance that `direnv allow` will not load the environment correctly and silently fail. This is observable when you attempt to run `poetry install`, as you will get a `command not found` error in the shell.
