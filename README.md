@@ -1,6 +1,6 @@
 # PII Detection and Anonymiser
 
-This is a python app to detect and anonymise PII data using Named Entity Recognition with Flair-based Embeddings built on top of [Presidio](https://github.com/microsoft/presidio/tree/main).
+This is a python app to detect and anonymise PII data using Named Entity Recognition with Flair-based Embeddings built on top of [Presidio](https://github.com/microsoft/presidio).
 
 ## Prerequisites
 
@@ -39,6 +39,11 @@ poetry run python src/cli.py anonymize --vaulturl "http://127.0.0.1:8200" --vaul
 # help
 poetry run python src/cli.py --help
 ```
+
+## Use cases
+
+* Detecting if PII is present in any of your files, text or structured data like json, etc.
+* Anonymizing/Deanonymizing PII data before sending to services like OpenAI, Anthropic, etc. for training or inference.
 
 ## Troubleshooting
 
