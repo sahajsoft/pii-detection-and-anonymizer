@@ -9,8 +9,9 @@ from flask import Flask, request, jsonify, Response, send_file
 import csv
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_analyzer import DictAnalyzerResult, RecognizerResult
-from presidio_anonymizer import BatchAnonymizerEngine
+from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine, anonymizer_engine
 from config.nlp_engine_config import FlairNLPEngine
+from operators.vault import Vault
 
 DEFAULT_PORT = "3000"
 NLP_ENGINE = "flair/ner-english-large"
@@ -79,6 +80,14 @@ class Server:
             """Execute the anonymizer function."""
             try:
                 analyzer_results = json.loads(request.form['analyzer_results'])
+                anonymizer_engine = None
+                vault_config = request.form.get('vault_config')
+                if vault_config:
+                    vault_config = json.loads(vault_config)
+                    anonymizer_engine = Vault(vault_url=vault_config['url'], vault_key=vault_config['key'], vault_token=vault_config.get('token'))
+                else:
+                    anonymizer_engine = AnonymizerEngine()
+
                 dict_analyzer_results = []
                 for key, value in analyzer_results.items():
                     recognizer_results = []
@@ -93,7 +102,7 @@ class Server:
                         recognizer_results.append(each_entry_recognizer_results)
                     dict_analyzer_results.append(DictAnalyzerResult(key=key, value=value["value"], recognizer_results=recognizer_results))
 
-                anonymizer = BatchAnonymizerEngine()
+                anonymizer = BatchAnonymizerEngine(anonymizer_engine)
                 anonymized_results = anonymizer.anonymize_dict(dict_analyzer_results)
 
                 data = []
@@ -117,7 +126,7 @@ class Server:
             except Exception as e:
                 self.logger.error(
                     f"A fatal error occurred during execution of "
-                    f"AnonymizerEngine.anonymize(). {e}"
+                    f"anonymize(). {e}"
                 )
                 return jsonify(error=e.args[0]), 500
 
