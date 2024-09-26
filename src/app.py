@@ -9,7 +9,7 @@ from flask import Flask, request, jsonify, Response, send_file
 import csv
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_analyzer import DictAnalyzerResult, RecognizerResult
-from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine, anonymizer_engine
+from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 from operators.vault import Vault
 
