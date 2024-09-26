@@ -75,7 +75,7 @@ def test_anonymize_csv_pii(client):
     assert anonymizer_response.status_code == 200
     anonymizer_data = anonymizer_response.get_data(as_text=True)
     expected_anonymized_data = open('./tests/sample_data/anonymized_data.csv', 'r').read()
-    assert anonymizer_data.strip("\r\n") == expected_anonymized_data.strip("\r\n")
+    assert anonymizer_data.replace("\r", "") == expected_anonymized_data
 
 def test_vault_anonymize_csv_pii(client):
     analyze_response = client.post("/analyze", data={
@@ -100,4 +100,4 @@ def test_vault_anonymize_csv_pii(client):
         assert anonymizer_response.status_code == 200
         anonymizer_data = anonymizer_response.get_data(as_text=True)
         expected_anonymized_data = open('./tests/sample_data/vault_encrypted.csv', 'r').read()
-        assert anonymizer_data.strip("\r\n") == expected_anonymized_data.strip("\r\n")
+        assert anonymizer_data.replace("\r", "") == expected_anonymized_data
