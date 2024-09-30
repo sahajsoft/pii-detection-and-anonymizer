@@ -1,0 +1,4 @@
+city,comments,id,name
+<LOCATION>,called him yesterday to confirm he requested to call back in 2 days,1,<PERSON>
+<ORGANIZATION>,accepted the offer license number <US_DRIVER_LICENSE>,2,<PERSON>
+<ORGANIZATION>,need to call him at phone number <PHONE_NUMBER>,3,<PERSON>

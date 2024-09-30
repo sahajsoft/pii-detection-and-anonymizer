@@ -1,28 +1,26 @@
 import argparse
 
+from presidio_analyzer.analyzer_engine import AnalyzerEngine
 from presidio_anonymizer.entities.engine.result.operator_result import OperatorResult
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
-from presidio_anonymizer import BatchAnonymizerEngine
+from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 from operators.vault import Vault
-from text.text import text_analyzer, text_anonymizer
 
 NLP_ENGINE = "flair/ner-english-large"
 
 
 def analyze(args):
     analyzer_results = None
+    nlp_engine = FlairNLPEngine(NLP_ENGINE)
 
     if args.text:
-        analyzer_results = text_analyzer(args.text, args.language)
+        nlp_engine, registry = nlp_engine.create_nlp_engine()
+        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+        analyzer_results = engine.analyze(text=args.text, language=args.language)
     else:
-        nlp_engine = FlairNLPEngine(NLP_ENGINE)
         engine = CSVAnalyzerEngine(nlp_engine)
-
-        analyzer_results = engine.analyze_csv(
-            csv_full_path=args.filepath,
-            language=args.language
-        )
+        analyzer_results = engine.analyze_csv(csv_full_path=args.filepath, language=args.language)
 
     print(analyzer_results)
     return analyzer_results
@@ -31,15 +29,17 @@ def analyze(args):
 def anonymize(args):
     analyzer_results = analyze(args)
     anonymized_results = None
+    anonymizer_engine = None
+
+    if args.vaulturl:
+        anonymizer_engine = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
+    else:
+        anonymizer_engine = AnonymizerEngine()
 
     if args.text:
-        if args.vaulturl:
-            vault = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
-            anonymized_results = vault.anonymize(args.text, analyzer_results)
-        else:
-            anonymized_results = text_anonymizer(args.text, analyzer_results)
+        anonymized_results = anonymizer_engine.anonymize(args.text, analyzer_results)
     else:
-        anonymizer = BatchAnonymizerEngine()
+        anonymizer = BatchAnonymizerEngine(anonymizer_engine)
         anonymized_results = anonymizer.anonymize_dict(analyzer_results)
 
     print(anonymized_results.to_json())
