@@ -27,17 +27,15 @@ poetry run python src/app.py
 ```
 
 To run the cli locally, run any of the following commands:
-```
+
+```sh
 # simple text analyze and anonymize
 poetry run python src/cli.py analyze --text "My name is Don Stark and my phone number is 212-555-5555"
 poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
 
 # stdin
-
-```sh
 poetry run python src/cli.py analyze < sample.txt
 cat sample.txt | poetry run python src/cli.py analyze
-```
 
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
