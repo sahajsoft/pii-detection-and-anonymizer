@@ -29,20 +29,24 @@ poetry run python src/app.py
 To run the cli locally, run any of the following commands:
 
 ```sh
-# simple text analyze and anonymize
-poetry run python src/cli.py analyze --text "My name is Don Stark and my phone number is 212-555-5555"
-poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
+alias pii='poetry run python src/cli.py'
 
-# stdin
-poetry run python src/cli.py analyze < sample.txt
-cat sample.txt | poetry run python src/cli.py analyze
+# simple text analyze and anonymize
+pii analyze --text "My name is Don Stark and my phone number is 212-555-5555"
+pii anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
+
+# standard streams
+pii analyze < sample.txt
+cat sample.txt | pii analyze
+cat sample.txt | pii analyze | pii anonymize
+cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
-poetry run python src/cli.py anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" --text "My name is Don Stark and my phone number is 212-555-5555"
+pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" --text "My name is Don Stark and my phone number is 212-555-5555"
 
 # help
-poetry run python src/cli.py --help
+pii --help
 ```
 
 ## Use cases
