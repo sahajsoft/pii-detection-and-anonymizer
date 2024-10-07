@@ -32,6 +32,13 @@ To run the cli locally, run any of the following commands:
 poetry run python src/cli.py analyze --text "My name is Don Stark and my phone number is 212-555-5555"
 poetry run python src/cli.py anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
 
+# stdin
+
+```sh
+poetry run python src/cli.py analyze < sample.txt
+cat sample.txt | poetry run python src/cli.py analyze
+```
+
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
 poetry run python src/cli.py anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" --text "My name is Don Stark and my phone number is 212-555-5555"
