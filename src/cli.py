@@ -26,6 +26,8 @@ def analyze(args):
         analyzer_results = engine.analyze_csv(
             csv_full_path=args.filepath, language=args.language
         )
+        print(analyzer_results)
+        return analyzer_results
     else:
         nlp_engine, registry = nlp_engine.create_nlp_engine()
         engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
