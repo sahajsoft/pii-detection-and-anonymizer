@@ -1,9 +1,10 @@
-'''
+"""
 Referred from
 1. https://github.com/microsoft/presidio/blob/main/docs/samples/python/flair_recognizer.py
 2. https://huggingface.co/spaces/presidio/presidio_demo/blob/main/flair_recognizer.py
 
-'''
+"""
+
 import logging
 from typing import Optional, List, Tuple, Set
 
@@ -23,7 +24,6 @@ class FlairRecognizer(EntityRecognizer):
         "LOCATION",
         "PERSON",
         "ORGANIZATION",
-
     ]
 
     DEFAULT_EXPLANATION = "Identified as {} by Flair's Named Entity Recognition"
@@ -32,7 +32,6 @@ class FlairRecognizer(EntityRecognizer):
         ({"LOCATION"}, {"LOC", "LOCATION"}),
         ({"PERSON"}, {"PER", "PERSON"}),
         ({"ORGANIZATION"}, {"ORG"}),
-
     ]
 
     MODEL_LANGUAGES = {"en": "flair/ner-english-large"}
@@ -41,16 +40,15 @@ class FlairRecognizer(EntityRecognizer):
         "PER": "PERSON",
         "LOC": "LOCATION",
         "ORG": "ORGANIZATION",
-
     }
 
     def __init__(
-            self,
-            supported_language: str = "en",
-            supported_entities: Optional[List[str]] = None,
-            check_label_groups: Optional[Tuple[Set, Set]] = None,
-            model: SequenceTagger = None,
-            model_path: Optional[str] = None,
+        self,
+        supported_language: str = "en",
+        supported_entities: Optional[List[str]] = None,
+        check_label_groups: Optional[Tuple[Set, Set]] = None,
+        model: SequenceTagger = None,
+        model_path: Optional[str] = None,
     ):
         self.check_label_groups = (
             check_label_groups if check_label_groups else self.CHECK_LABEL_GROUPS
@@ -90,7 +88,7 @@ class FlairRecognizer(EntityRecognizer):
 
     # Class to use Flair with Presidio as an external recognizer.
     def analyze(
-            self, text: str, entities: List[str] = None, nlp_artifacts: NlpArtifacts = None
+        self, text: str, entities: List[str] = None, nlp_artifacts: NlpArtifacts = None
     ) -> List[RecognizerResult]:
         """
         Analyze text using Text Analytics.
@@ -117,7 +115,7 @@ class FlairRecognizer(EntityRecognizer):
 
             for ent in sentences.get_spans("ner"):
                 if not self.__check_label(
-                        entity, ent.labels[0].value, self.check_label_groups
+                    entity, ent.labels[0].value, self.check_label_groups
                 ):
                     continue
                 textual_explanation = self.DEFAULT_EXPLANATION.format(
@@ -147,7 +145,7 @@ class FlairRecognizer(EntityRecognizer):
         return flair_results
 
     def build_flair_explanation(
-            self, original_score: float, explanation: str
+        self, original_score: float, explanation: str
     ) -> AnalysisExplanation:
         """
         Create explanation for why this result was detected.
@@ -164,7 +162,7 @@ class FlairRecognizer(EntityRecognizer):
 
     @staticmethod
     def __check_label(
-            entity: str, label: str, check_label_groups: Tuple[Set, Set]
+        entity: str, label: str, check_label_groups: Tuple[Set, Set]
     ) -> bool:
         return any(
             [entity in egrp and label in lgrp for egrp, lgrp in check_label_groups]

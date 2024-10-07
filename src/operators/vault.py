@@ -6,19 +6,23 @@ import hvac
 from presidio_anonymizer import ConflictResolutionStrategy, OperatorResult
 from presidio_anonymizer.anonymizer_engine import AnonymizerEngine
 from presidio_anonymizer.deanonymize_engine import DeanonymizeEngine
-from presidio_anonymizer.entities import OperatorConfig, InvalidParamException, RecognizerResult
+from presidio_anonymizer.entities import (
+    OperatorConfig,
+    InvalidParamException,
+    RecognizerResult,
+)
 from presidio_anonymizer.operators import Operator, OperatorType
 
 
 class VaultEncrypt(Operator):
     def _base64ify(self, bytes_or_str):
         if isinstance(bytes_or_str, str):
-            input_bytes = bytes_or_str.encode('utf8')
+            input_bytes = bytes_or_str.encode("utf8")
         else:
             input_bytes = bytes_or_str
 
         output_bytes = base64.urlsafe_b64encode(input_bytes)
-        return output_bytes.decode('ascii')
+        return output_bytes.decode("ascii")
 
     def operate(self, text: str, params: Dict = None) -> str:
         vault_url = params.get("vault_url")
@@ -31,7 +35,7 @@ class VaultEncrypt(Operator):
             name=key,
             plaintext=self._base64ify(text),
         )
-        ciphertext = encrypt_data_response['data']['ciphertext']
+        ciphertext = encrypt_data_response["data"]["ciphertext"]
 
         return ciphertext
 
@@ -42,7 +46,9 @@ class VaultEncrypt(Operator):
             if result.scheme and result.netloc:
                 pass
             else:
-                raise InvalidParamException(f"Invalid input, vault_url must be a valid URL.")
+                raise InvalidParamException(
+                    f"Invalid input, vault_url must be a valid URL."
+                )
         else:
             raise InvalidParamException(f"Invalid input, vault_url must be a string.")
 
@@ -50,14 +56,15 @@ class VaultEncrypt(Operator):
         if isinstance(key, str) and key:
             pass
         else:
-            raise InvalidParamException(f"Invalid input, key must be a valid encryption key name.")
+            raise InvalidParamException(
+                f"Invalid input, key must be a valid encryption key name."
+            )
 
     def operator_name(self) -> str:
         return "vault_encrypt"
 
     def operator_type(self) -> OperatorType:
         return OperatorType.Anonymize
-
 
 
 class VaultDecrypt(Operator):
@@ -72,8 +79,8 @@ class VaultDecrypt(Operator):
             name=key,
             ciphertext=text,
         )
-        encodedtext = decrypt_data_response['data']['plaintext']
-        plaintext = base64.b64decode(encodedtext).decode('utf8')
+        encodedtext = decrypt_data_response["data"]["plaintext"]
+        plaintext = base64.b64decode(encodedtext).decode("utf8")
 
         return plaintext
 
@@ -84,7 +91,9 @@ class VaultDecrypt(Operator):
             if result.scheme and result.netloc:
                 pass
             else:
-                raise InvalidParamException(f"Invalid input, vault_url must be a valid URL.")
+                raise InvalidParamException(
+                    f"Invalid input, vault_url must be a valid URL."
+                )
         else:
             raise InvalidParamException(f"Invalid input, vault_url must be a string.")
 
@@ -92,7 +101,9 @@ class VaultDecrypt(Operator):
         if isinstance(key, str) and key:
             pass
         else:
-            raise InvalidParamException(f"Invalid input, key must be a valid encryption key name.")
+            raise InvalidParamException(
+                f"Invalid input, key must be a valid encryption key name."
+            )
 
     def operator_name(self) -> str:
         return "vault_decrypt"
@@ -106,14 +117,21 @@ class Vault:
         self.vault_config = {
             "vault_url": vault_url,
             "key": vault_key,
-            "vault_token": vault_token
+            "vault_token": vault_token,
         }
 
-    def anonymize(self, text: str, analyzer_results: List[RecognizerResult], conflict_resolution: ConflictResolutionStrategy = None):
+    def anonymize(
+        self,
+        text: str,
+        analyzer_results: List[RecognizerResult],
+        conflict_resolution: ConflictResolutionStrategy = None,
+    ):
         anonymizer = AnonymizerEngine()
         anonymizer.add_anonymizer(VaultEncrypt)
         operators = {"DEFAULT": OperatorConfig("vault_encrypt", self.vault_config)}
-        return anonymizer.anonymize(text, analyzer_results, operators, conflict_resolution)
+        return anonymizer.anonymize(
+            text, analyzer_results, operators, conflict_resolution
+        )
 
     def deanonymize(self, text: str, anonymizer_result_items: List[OperatorResult]):
         deanonymizer = DeanonymizeEngine()
