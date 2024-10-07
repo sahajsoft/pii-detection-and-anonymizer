@@ -17,6 +17,7 @@ DEFAULT_PORT = "3000"
 NLP_ENGINE = "flair/ner-english-large"
 UPLOAD_DIR = "file_uploads"
 
+
 class Server:
     """HTTP Server for calling Presidio Analyzer."""
 
@@ -40,18 +41,17 @@ class Server:
         def analyze() -> Tuple[str, int]:
             """Execute the analyzer function."""
             try:
-                file = request.files['file']
-                language = request.form['language']
-                if file.filename == '':
-                    return jsonify({'error': 'No selected file'}), 400
+                file = request.files["file"]
+                language = request.form["language"]
+                if file.filename == "":
+                    return jsonify({"error": "No selected file"}), 400
 
-                filepath = f'{UPLOAD_DIR}/{uuid.uuid4()}'
+                filepath = f"{UPLOAD_DIR}/{uuid.uuid4()}"
                 file.save(filepath)
                 self.logger.info(f"Successfully saved file: {filepath}")
 
                 analyzer_results = self.engine.analyze_csv(
-                    csv_full_path=filepath,
-                    language=language
+                    csv_full_path=filepath, language=language
                 )
                 self.logger.debug(f"Analyzed file with results: {analyzer_results}")
                 os.remove(filepath)
@@ -64,7 +64,7 @@ class Server:
                         recognizer_results.append([o.to_dict() for o in r])
                     analyzer_results_list[a.key] = {
                         "value": a.value,
-                        "recognizer_results": recognizer_results
+                        "recognizer_results": recognizer_results,
                     }
 
                 return jsonify(analyzer_results_list), 200
@@ -79,12 +79,16 @@ class Server:
         def anonymize() -> Response:
             """Execute the anonymizer function."""
             try:
-                analyzer_results = json.loads(request.form['analyzer_results'])
+                analyzer_results = json.loads(request.form["analyzer_results"])
                 anonymizer_engine = None
-                vault_config = request.form.get('vault_config')
+                vault_config = request.form.get("vault_config")
                 if vault_config:
                     vault_config = json.loads(vault_config)
-                    anonymizer_engine = Vault(vault_url=vault_config['url'], vault_key=vault_config['key'], vault_token=vault_config.get('token'))
+                    anonymizer_engine = Vault(
+                        vault_url=vault_config["url"],
+                        vault_key=vault_config["key"],
+                        vault_token=vault_config.get("token"),
+                    )
                 else:
                     anonymizer_engine = AnonymizerEngine()
 
@@ -95,12 +99,18 @@ class Server:
                         each_entry_recognizer_results = []
                         for r in results_for_each_entry:
                             each_entry_recognizer_results.append(
-                                RecognizerResult(r["entity_type"],
-                                                r["start"],
-                                                r["end"],
-                                                r["score"]))
+                                RecognizerResult(
+                                    r["entity_type"], r["start"], r["end"], r["score"]
+                                )
+                            )
                         recognizer_results.append(each_entry_recognizer_results)
-                    dict_analyzer_results.append(DictAnalyzerResult(key=key, value=value["value"], recognizer_results=recognizer_results))
+                    dict_analyzer_results.append(
+                        DictAnalyzerResult(
+                            key=key,
+                            value=value["value"],
+                            recognizer_results=recognizer_results,
+                        )
+                    )
 
                 anonymizer = BatchAnonymizerEngine(anonymizer_engine)
                 anonymized_results = anonymizer.anonymize_dict(dict_analyzer_results)
@@ -111,24 +121,24 @@ class Server:
                     row = {key: anonymized_results[key][i] for key in keys}
                     data.append(row)
 
-                filename = f'{UPLOAD_DIR}/{uuid.uuid4()}.csv'
-                with open(filename, 'w', newline='') as output:
+                filename = f"{UPLOAD_DIR}/{uuid.uuid4()}.csv"
+                with open(filename, "w", newline="") as output:
                     writer = csv.DictWriter(output, fieldnames=keys)
                     writer.writeheader()
                     writer.writerows(data)
 
                 return send_file(
                     os.path.abspath(filename),
-                    mimetype='text/csv',
+                    mimetype="text/csv",
                     as_attachment=True,
-                    download_name='anonymized_data.csv'
+                    download_name="anonymized_data.csv",
                 )
             except Exception as e:
                 self.logger.error(
-                    f"A fatal error occurred during execution of "
-                    f"anonymize(). {e}"
+                    f"A fatal error occurred during execution of " f"anonymize(). {e}"
                 )
                 return jsonify(error=e.args[0]), 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", DEFAULT_PORT))

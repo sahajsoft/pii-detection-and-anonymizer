@@ -18,14 +18,16 @@ class CSVAnalyzerEngine(BatchAnalyzerEngine):
         return analyzer
 
     def analyze_csv(
-            self,
-            csv_full_path: str,
-            language: str,
-            keys_to_skip: Optional[List[str]] = None,
-            **kwargs,
+        self,
+        csv_full_path: str,
+        language: str,
+        keys_to_skip: Optional[List[str]] = None,
+        **kwargs,
     ) -> Iterable[DictAnalyzerResult]:
-        with open(csv_full_path, 'r') as csv_file:
+        with open(csv_full_path, "r") as csv_file:
             csv_list = list(csv.reader(csv_file))
-            csv_dict = {header: list(map(str, values)) for header, *values in zip(*csv_list)}
+            csv_dict = {
+                header: list(map(str, values)) for header, *values in zip(*csv_list)
+            }
             analyzer_results = self.analyze_dict(csv_dict, language, keys_to_skip)
             return list(analyzer_results)
