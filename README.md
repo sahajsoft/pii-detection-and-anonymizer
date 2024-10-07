@@ -39,6 +39,7 @@ pii anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
 pii analyze < sample.txt
 cat sample.txt | pii analyze
 cat sample.txt | pii analyze | pii anonymize
+cat sample.txt | pii analyze | curl curl -X POST -H "Content-Type: application/json" --data-binary @- http://localhost:5001/anonymize
 cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
 # vault integration
