@@ -61,15 +61,13 @@ def anonymize(args):
         text = args.text
     else:
         input_data = sys.stdin.read()
-    input_json = json.loads(input_data)
-
-    text = input_json.get("text", "")
-    analyzer_results_data = input_json.get("analyzer_results", [])
-
-    analyzer_results = [
-        RecognizerResult.from_json(analyzer_result)
-        for analyzer_result in analyzer_results_data
-    ]
+        input_json = json.loads(input_data)
+        text = input_json.get("text", "")
+        analyzer_results_data = input_json.get("analyzer_results", [])
+        analyzer_results = [
+            RecognizerResult.from_json(analyzer_result)
+            for analyzer_result in analyzer_results_data
+        ]
 
     if args.vaulturl:
         anonymizer_engine = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
@@ -95,17 +93,32 @@ def anonymize(args):
 
 def deanonymize(args):
     vault = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
-    anonymized_results = []
-    import json
-
-    for r in json.loads(args.anonymized_results_list):
-        anonymized_results.append(
-            OperatorResult(
-                r["start"], r["end"], r["entity_type"], r["text"], r["operator"]
+    if args.text and args.anonymized_results_list:
+        anonymizer_results = []
+        for r in json.loads(args.anonymized_results_list):
+            anonymizer_results.append(
+                OperatorResult(
+                    r["start"], r["end"], r["entity_type"], r["text"], r["operator"]
+                )
             )
-        )
+        text = args.text
+    else:
+        input_data = sys.stdin.read()
+        input_json = json.loads(input_data)
+        text = input_json.get("text", "")
+        anonymizer_results_data = input_json.get("anonymizer_results", [])
+        anonymizer_results = [
+            OperatorResult(
+                anonymizer_result["start"],
+                anonymizer_result["end"],
+                anonymizer_result["entity_type"],
+                anonymizer_result["text"],
+                anonymizer_result["operator"],
+            )
+            for anonymizer_result in anonymizer_results_data
+        ]
 
-    deanonymized_result = vault.deanonymize(args.text, anonymized_results)
+    deanonymized_result = vault.deanonymize(text, anonymizer_results)
 
     print(deanonymized_result.to_json())
     return deanonymized_result
@@ -141,12 +154,12 @@ def main():
     deanonymizer_parser = subparsers.add_parser(
         "deanonymize", description="Deanonymize inputs"
     )
-    deanonymizer_parser.add_argument("--text", required=True, type=str)
+    deanonymizer_parser.add_argument("--text", required=False, type=str)
     deanonymizer_parser.add_argument("--vaulturl", required=True, type=str)
     deanonymizer_parser.add_argument("--vaulttoken", required=False, type=str)
     deanonymizer_parser.add_argument("--vaultkey", required=True, type=str)
     deanonymizer_parser.add_argument(
-        "--anonymized_results_list", required=True, type=str
+        "--anonymized_results_list", required=False, type=str
     )
     deanonymizer_parser.set_defaults(func=deanonymize)
 
