@@ -41,6 +41,7 @@ cat sample.txt | pii analyze
 cat sample.txt | pii analyze | pii anonymize
 cat sample.txt | pii analyze | curl curl -X POST -H "Content-Type: application/json" --data-binary @- http://localhost:5001/anonymize
 cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
+cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" | pii deanonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
