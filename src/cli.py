@@ -1,4 +1,5 @@
 import argparse
+import json
 
 from presidio_analyzer.analyzer_engine import AnalyzerEngine
 from presidio_anonymizer.entities.engine.result.operator_result import OperatorResult
@@ -6,23 +7,44 @@ from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 from operators.vault import Vault
+import sys
+import logging
 
 NLP_ENGINE = "flair/ner-english-large"
 
+logging.getLogger('presidio-analyzer').setLevel(logging.ERROR)
+logging.getLogger('flair').setLevel(logging.ERROR)
 
 def analyze(args):
     analyzer_results = None
     nlp_engine = FlairNLPEngine(NLP_ENGINE)
 
-    if args.text:
-        nlp_engine, registry = nlp_engine.create_nlp_engine()
-        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
-        analyzer_results = engine.analyze(text=args.text, language=args.language)
-    else:
+    if args.filepath:
         engine = CSVAnalyzerEngine(nlp_engine)
         analyzer_results = engine.analyze_csv(csv_full_path=args.filepath, language=args.language)
+    else:
+        nlp_engine, registry = nlp_engine.create_nlp_engine()
+        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+        if args.text:
+            text = args.text
+        else:
+            text = sys.stdin.read()
+        analyzer_results = engine.analyze(text=text, language=args.language)
 
-    print(analyzer_results)
+    output = {
+        "text": text,
+        "analyzer_results": [
+        {
+            "entity_type": result.entity_type,
+            "start": result.start,
+            "end": result.end,
+            "score": result.score,
+            "analysis_explanation": result.analysis_explanation,
+            "recognition_metadata": result.recognition_metadata
+        }
+        for result in analyzer_results
+    ]}
+    print(json.dumps(output, indent=2))
     return analyzer_results
 
 
