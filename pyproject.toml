@@ -16,6 +16,7 @@ presidio-analyzer = {version = "^2.2.354", extras = ["transformers", "stanza"]}
 pytest = "^8.2.1"
 flask = "^3.0.3"
 hvac = "^2.3.0"
+black = "^24.8.0"
 
 
 [build-system]
