@@ -43,6 +43,10 @@ cat sample.txt | pii analyze | curl curl -X POST -H "Content-Type: application/j
 cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" | pii deanonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
+# csv files
+cat sample.csv | pii analyze --csv
+cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text' > anonymized.csv
+
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
