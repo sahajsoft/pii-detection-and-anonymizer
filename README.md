@@ -45,6 +45,8 @@ cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" 
 
 # csv files
 cat sample.csv | pii analyze --csv
+cat sample.csv | pii analyze --csv | pii anonymize
+cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text'
 cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text' > anonymized.csv
 
 # vault integration
