@@ -31,11 +31,11 @@ To run the cli locally, run any of the following commands:
 ```sh
 alias pii='poetry run python src/cli.py'
 
-# simple text analyze and anonymize
-pii analyze --text "My name is Don Stark and my phone number is 212-555-5555"
-pii anonymize --text "My name is Don Stark and my phone number is 212-555-5555"
+# text
+echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze 
+echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze | pii anonymize
 
-# standard streams
+# text files
 pii analyze < sample.txt
 cat sample.txt | pii analyze
 cat sample.txt | pii analyze | pii anonymize
@@ -45,7 +45,7 @@ cat sample.txt | pii analyze | pii anonymize --vaulturl "http://127.0.0.1:8200" 
 
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
-pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders" --text "My name is Don Stark and my phone number is 212-555-5555"
+echo "My name is Don Stark and my phone number is 212-555-5555" | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
 # help
 pii --help
