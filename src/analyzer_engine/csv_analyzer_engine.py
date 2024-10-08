@@ -22,12 +22,23 @@ class CSVAnalyzerEngine:
             line_text = ", ".join(row) + "\n"
             for idx, value in enumerate(row):
                 header = headers[idx]
+                prefix = "the " + header + " is: "
+                suffix = ""
                 analysis_result = self.analyzer_engine.analyze(
-                    value, language, context=header
+                    prefix + value + suffix,
+                    language,
+                    context="this is the value in the "
+                    + header
+                    + " column in a csv file with the following columns: "
+                    + ",".join(headers),
                 )
                 for result in analysis_result:
+                    if result.end <= len(prefix):
+                        continue
                     line_offset = text.index(value, line_start_index) - current_index
-                    adjusted_start = current_index + line_offset + result.start
+                    adjusted_start = (
+                        current_index + line_offset + result.start - len(prefix)
+                    )
                     adjusted_end = adjusted_start + (result.end - result.start)
                     results.append(
                         RecognizerResult(
