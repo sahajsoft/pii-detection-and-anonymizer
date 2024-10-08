@@ -8,7 +8,7 @@ from flask import Flask, request, jsonify, Response, send_file
 
 import csv
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
-from presidio_analyzer import DictAnalyzerResult, RecognizerResult
+from presidio_analyzer import AnalyzerEngine, DictAnalyzerResult, RecognizerResult
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
 from operators.vault import Vault
@@ -27,7 +27,9 @@ class Server:
         self.app = Flask(__name__)
         self.logger.info("Starting analyzer engine")
         nlp_engine = FlairNLPEngine(NLP_ENGINE)
-        self.engine = CSVAnalyzerEngine(nlp_engine)
+        nlp_engine, registry = nlp_engine.create_nlp_engine()
+        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+        self.engine = CSVAnalyzerEngine(engine)
         self.logger.info("Started analyzer engine")
         if not os.path.exists(UPLOAD_DIR):
             os.makedirs(UPLOAD_DIR)
@@ -49,25 +51,30 @@ class Server:
                 filepath = f"{UPLOAD_DIR}/{uuid.uuid4()}"
                 file.save(filepath)
                 self.logger.info(f"Successfully saved file: {filepath}")
+                with open(filepath, "r") as file:
+                    text = file.read()
 
-                analyzer_results = self.engine.analyze_csv(
-                    csv_full_path=filepath, language=language
-                )
+                analyzer_results = self.engine.analyze(text, language=language)
                 self.logger.debug(f"Analyzed file with results: {analyzer_results}")
                 os.remove(filepath)
                 self.logger.info(f"Successfully removed file: {filepath}")
 
-                analyzer_results_list = {}
-                for a in analyzer_results:
-                    recognizer_results = []
-                    for r in a.recognizer_results:
-                        recognizer_results.append([o.to_dict() for o in r])
-                    analyzer_results_list[a.key] = {
-                        "value": a.value,
-                        "recognizer_results": recognizer_results,
-                    }
-
-                return jsonify(analyzer_results_list), 200
+                return (
+                    jsonify(
+                        [
+                            {
+                                "entity_type": result.entity_type,
+                                "start": result.start,
+                                "end": result.end,
+                                "score": result.score,
+                                "analysis_explanation": result.analysis_explanation,
+                                "recognition_metadata": result.recognition_metadata,
+                            }
+                            for result in analyzer_results
+                        ]
+                    ),
+                    200,
+                )
             except Exception as e:
                 self.logger.error(
                     f"A fatal error occurred during execution of "
