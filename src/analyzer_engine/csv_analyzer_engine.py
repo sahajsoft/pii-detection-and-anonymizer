@@ -1,33 +1,44 @@
-from presidio_analyzer import AnalyzerEngine
-from typing import List, Iterable, Optional
-
-from presidio_analyzer import BatchAnalyzerEngine, DictAnalyzerResult
-import csv
+from presidio_analyzer import AnalyzerEngine, RecognizerResult
+from typing import List
+from csv import reader
 
 
-class CSVAnalyzerEngine(BatchAnalyzerEngine):
+class CSVAnalyzerEngine:
+    def __init__(self, analyzer_engine: AnalyzerEngine):
+        self.analyzer_engine = analyzer_engine
 
-    def __init__(self, nlp_engine):
-        self.nlp_engine = nlp_engine
-        analyzer_engine = self.create_analyser_engine()
-        super().__init__(analyzer_engine)
-
-    def create_analyser_engine(self):
-        nlp_engine, registry = self.nlp_engine.create_nlp_engine()
-        analyzer = AnalyzerEngine(nlp_engine=nlp_engine, registry=registry)
-        return analyzer
-
-    def analyze_csv(
+    def analyze(
         self,
-        csv_full_path: str,
+        text: str,
         language: str,
-        keys_to_skip: Optional[List[str]] = None,
-        **kwargs,
-    ) -> Iterable[DictAnalyzerResult]:
-        with open(csv_full_path, "r") as csv_file:
-            csv_list = list(csv.reader(csv_file))
-            csv_dict = {
-                header: list(map(str, values)) for header, *values in zip(*csv_list)
-            }
-            analyzer_results = self.analyze_dict(csv_dict, language, keys_to_skip)
-            return list(analyzer_results)
+    ) -> List[RecognizerResult]:
+        csv_lines = text.splitlines()
+        csv_reader = reader(csv_lines)
+        headers = next(csv_reader)
+        results = []
+        current_index = 0
+        for row in csv_reader:
+            line_start_index = current_index
+            line_text = ", ".join(row) + "\n"
+            for idx, value in enumerate(row):
+                header = headers[idx]
+                analysis_result = self.analyzer_engine.analyze(
+                    value, language, context=header
+                )
+                for result in analysis_result:
+                    line_offset = text.index(value, line_start_index) - current_index
+                    adjusted_start = current_index + line_offset + result.start
+                    adjusted_end = adjusted_start + (result.end - result.start)
+                    results.append(
+                        RecognizerResult(
+                            result.entity_type,
+                            adjusted_start,
+                            adjusted_end,
+                            result.score,
+                            result.analysis_explanation,
+                            result.recognition_metadata,
+                        )
+                    )
+            current_index += len(line_text)
+
+        return results
