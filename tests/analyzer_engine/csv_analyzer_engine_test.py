@@ -1,3 +1,5 @@
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
 import pytest
 
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
@@ -6,13 +8,12 @@ from config.nlp_engine_config import FlairNLPEngine
 
 def test_csv_analyzer_engine_anonymizer():
     nlp_engine = FlairNLPEngine("flair/ner-english-large")
-    csv_analyzer = CSVAnalyzerEngine(nlp_engine)
-    from presidio_anonymizer import BatchAnonymizerEngine
-
-    analyzer_results = csv_analyzer.analyze_csv(
-        "./tests/sample_data/sample_data.csv", language="en"
-    )
-
-    anonymizer = BatchAnonymizerEngine()
-    anonymized_results = anonymizer.anonymize_dict(analyzer_results)
+    nlp_engine, registry = nlp_engine.create_nlp_engine()
+    engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+    csv_analyzer = CSVAnalyzerEngine(engine)
+    with open("./tests/sample_data/sample_data.csv", "r") as file:
+        text = file.read()
+    analyzer_results = csv_analyzer.analyze(text, language="en")
+    anonymizer = AnonymizerEngine()
+    anonymized_results = anonymizer.anonymize(text, analyzer_results)
     assert anonymized_results
