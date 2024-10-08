@@ -20,20 +20,12 @@ logging.getLogger("flair").setLevel(logging.ERROR)
 def analyze(args):
     analyzer_results = None
     nlp_engine = FlairNLPEngine(NLP_ENGINE)
-
-    if args.filepath:
-        engine = CSVAnalyzerEngine(nlp_engine)
-        analyzer_results = engine.analyze_csv(
-            csv_full_path=args.filepath, language=args.language
-        )
-    else:
-        nlp_engine, registry = nlp_engine.create_nlp_engine()
-        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
-        if args.text:
-            text = args.text
-        else:
-            text = sys.stdin.read()
-        analyzer_results = engine.analyze(text=text, language=args.language)
+    nlp_engine, registry = nlp_engine.create_nlp_engine()
+    engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+    text = sys.stdin.read()
+    if args.csv:
+        engine = CSVAnalyzerEngine(engine)
+    analyzer_results = engine.analyze(text=text, language=args.language)
 
     output = {
         "text": text,
@@ -56,29 +48,21 @@ def analyze(args):
 def anonymize(args):
     anonymized_results = None
     anonymizer_engine = None
-    if args.text or args.filepath:
-        analyzer_results = analyze(args)
-        text = args.text
-    else:
-        input_data = sys.stdin.read()
-        input_json = json.loads(input_data)
-        text = input_json.get("text", "")
-        analyzer_results_data = input_json.get("analyzer_results", [])
-        analyzer_results = [
-            RecognizerResult.from_json(analyzer_result)
-            for analyzer_result in analyzer_results_data
-        ]
+    input_data = sys.stdin.read()
+    input_json = json.loads(input_data)
+    text = input_json.get("text", "")
+    analyzer_results_data = input_json.get("analyzer_results", [])
+    analyzer_results = [
+        RecognizerResult.from_json(analyzer_result)
+        for analyzer_result in analyzer_results_data
+    ]
 
     if args.vaulturl:
         anonymizer_engine = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
     else:
         anonymizer_engine = AnonymizerEngine()
 
-    if args.filepath:
-        anonymizer = BatchAnonymizerEngine(anonymizer_engine)
-        anonymized_results = anonymizer.anonymize_dict(analyzer_results)
-    else:
-        anonymized_results = anonymizer_engine.anonymize(text, analyzer_results)
+    anonymized_results = anonymizer_engine.anonymize(text, analyzer_results)
 
     json_results = json.loads(anonymized_results.to_json())
 
@@ -93,33 +77,21 @@ def anonymize(args):
 
 def deanonymize(args):
     vault = Vault(args.vaulturl, args.vaultkey, args.vaulttoken)
-    if args.text and args.anonymized_results_list:
-        anonymizer_results = []
-        for r in json.loads(args.anonymized_results_list):
-            anonymizer_results.append(
-                OperatorResult(
-                    r["start"], r["end"], r["entity_type"], r["text"], r["operator"]
-                )
-            )
-        text = args.text
-    else:
-        input_data = sys.stdin.read()
-        input_json = json.loads(input_data)
-        text = input_json.get("text", "")
-        anonymizer_results_data = input_json.get("anonymizer_results", [])
-        anonymizer_results = [
-            OperatorResult(
-                anonymizer_result["start"],
-                anonymizer_result["end"],
-                anonymizer_result["entity_type"],
-                anonymizer_result["text"],
-                anonymizer_result["operator"],
-            )
-            for anonymizer_result in anonymizer_results_data
-        ]
-
+    input_data = sys.stdin.read()
+    input_json = json.loads(input_data)
+    text = input_json.get("text", "")
+    anonymizer_results_data = input_json.get("anonymizer_results", [])
+    anonymizer_results = [
+        OperatorResult(
+            anonymizer_result["start"],
+            anonymizer_result["end"],
+            anonymizer_result["entity_type"],
+            anonymizer_result["text"],
+            anonymizer_result["operator"],
+        )
+        for anonymizer_result in anonymizer_results_data
+    ]
     deanonymized_result = vault.deanonymize(text, anonymizer_results)
-
     print(deanonymized_result.to_json())
     return deanonymized_result
 
@@ -133,18 +105,13 @@ def main():
     analyzer_parser = subparsers.add_parser(
         "analyze", description="Analyze inputs and return PII detection results"
     )
-    analyzer_parser.add_argument("--filepath", required=False, type=str, metavar="FILE")
-    analyzer_parser.add_argument("--text", required=False, type=str)
+    analyzer_parser.add_argument("--csv", action="store_true")
     analyzer_parser.add_argument("--language", required=False, type=str, default="en")
     analyzer_parser.set_defaults(func=analyze)
 
     anonymizer_parser = subparsers.add_parser(
         "anonymize", description="Anonymize inputs"
     )
-    anonymizer_parser.add_argument(
-        "--filepath", required=False, type=str, metavar="FILE"
-    )
-    anonymizer_parser.add_argument("--text", required=False, type=str)
     anonymizer_parser.add_argument("--language", required=False, type=str, default="en")
     anonymizer_parser.add_argument("--vaulturl", required=False, type=str)
     anonymizer_parser.add_argument("--vaulttoken", required=False, type=str)
@@ -154,7 +121,6 @@ def main():
     deanonymizer_parser = subparsers.add_parser(
         "deanonymize", description="Deanonymize inputs"
     )
-    deanonymizer_parser.add_argument("--text", required=False, type=str)
     deanonymizer_parser.add_argument("--vaulturl", required=True, type=str)
     deanonymizer_parser.add_argument("--vaulttoken", required=False, type=str)
     deanonymizer_parser.add_argument("--vaultkey", required=True, type=str)
