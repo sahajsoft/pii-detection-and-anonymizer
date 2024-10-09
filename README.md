@@ -13,7 +13,7 @@ docker pull ghcr.io/sahajsoft/pii
 To use, it's best to add an alias:
 
 ```sh
-alias pii=docker run --rm -i sahajsoft/pii
+alias pii=docker run --rm -i ghcr.io/sahajsoft/pii
 ```
 
 Then you can use `pii` as found below in sample commands.
@@ -26,7 +26,7 @@ To run the CLI locally, run any of the following commands:
 # alias for easier calls
 alias pii='poetry run python src/cli.py'
 # alias for docker
-alias pii=docker run --rm -i sahajsoft/pii
+alias pii=docker run --rm -i ghcr.io/sahajsoft/pii
 
 # text
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze 
