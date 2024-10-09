@@ -2,34 +2,31 @@
 
 This is a python app to detect and anonymise PII data using Named Entity Recognition with Flair-based Embeddings built on top of [Presidio](https://github.com/microsoft/presidio).
 
-## Prerequisites
-
-Run `./setup.sh` to install all dependencies. This will install [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) and [nix](https://nixos.org/download.html) then simply run `direnv allow` to install all build dependencies.
-
-Alternatively, make sure you have [python 3.11](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation) setup on your machine.
-
 ## Getting Started
 
-To get started, run the following:
-
-```
-poetry install --no-interaction --no-root
-poetry run pytest
-```
-
-### Demo
-
-You can run this as an api or using the cli. You can find the [API demo here](https://www.loom.com/share/ad8b37451ea54dcda8716cb5c6f11e94).
-
-You can run the API using the following command:
-```
-poetry run python src/app.py
-```
-
-To run the cli locally, run any of the following commands:
+You can use docker to install the app:
 
 ```sh
+docker pull ghcr.io/sahajsoft/pii
+```
+
+To use, it's best to add an alias:
+
+```sh
+alias pii=docker run --rm -i sahajsoft/pii
+```
+
+Then you can use `pii` as found below in sample commands.
+
+## Usage
+
+To run the CLI locally, run any of the following commands:
+
+```sh
+# alias for easier calls
 alias pii='poetry run python src/cli.py'
+# alias for docker
+alias pii=docker run --rm -i sahajsoft/pii
 
 # text
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze 
@@ -62,7 +59,24 @@ pii --help
 * Detecting if PII is present in any of your files, text or structured data like json, etc.
 * Anonymizing/Deanonymizing PII data before sending to services like OpenAI, Anthropic, etc. for training or inference.
 
-## Troubleshooting
+## Development
+
+### Prerequisites
+
+Run `./setup.sh` to install all dependencies. This will install [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) and [nix](https://nixos.org/download.html) then simply run `direnv allow` to install all build dependencies.
+
+Alternatively, make sure you have [python 3.11](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation) setup on your machine.
+
+### Running the app
+
+To get started, run the following:
+
+```
+poetry install --no-interaction --no-root
+poetry run pytest
+```
+
+### Troubleshooting
 
 There is a chance that `direnv allow` will not load the environment correctly and silently fail. This is observable when you attempt to run `poetry install`, as you will get a `command not found` error in the shell.
 To fix this, you need to run the nix commands directly. Run the following:
