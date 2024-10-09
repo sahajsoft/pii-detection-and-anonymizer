@@ -48,6 +48,11 @@ cat sample.csv | pii analyze --csv | pii anonymize
 cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text'
 cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text' > anonymized.csv
 
+
+# img files
+cat sample.png | pii analyze --img
+
+
 # vault integration
 ./vault.sh # start and configure vault server and transit secret engine keys
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"

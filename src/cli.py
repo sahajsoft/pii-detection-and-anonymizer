@@ -1,13 +1,20 @@
 import argparse
+import io
 import json
 
 from presidio_analyzer import RecognizerResult
 from presidio_analyzer.analyzer_engine import AnalyzerEngine
 from presidio_anonymizer.entities.engine.result.operator_result import OperatorResult
+from presidio_image_redactor import ImageAnalyzerEngine
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
+from utils.formatter import Formatter
 from operators.vault import Vault
+from PIL import Image
+from presidio_image_redactor import ImageRedactorEngine
+
+
 import sys
 import logging
 
@@ -19,28 +26,22 @@ logging.getLogger("flair").setLevel(logging.ERROR)
 
 def analyze(args):
     analyzer_results = None
-    nlp_engine = FlairNLPEngine(NLP_ENGINE)
-    nlp_engine, registry = nlp_engine.create_nlp_engine()
-    engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
-    text = sys.stdin.read()
-    if args.csv:
-        engine = CSVAnalyzerEngine(engine)
-    analyzer_results = engine.analyze(text=text, language=args.language)
+    input_buffer = sys.stdin.buffer.read()
+    text = None
+    image = None
+    if args.img:
+        image = Image.open(io.BytesIO(input_buffer))
+        analyzer_results = ImageAnalyzerEngine().analyze(image=image, language=args.language)
+    else:
+        nlp_engine = FlairNLPEngine(NLP_ENGINE)
+        nlp_engine, registry = nlp_engine.create_nlp_engine()
+        engine = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
+        text = input_buffer.decode("utf-8")
+        if args.csv:
+            engine = CSVAnalyzerEngine(engine)
+        analyzer_results = engine.analyze(text=text, language=args.language)
 
-    output = {
-        "text": text,
-        "analyzer_results": [
-            {
-                "entity_type": result.entity_type,
-                "start": result.start,
-                "end": result.end,
-                "score": result.score,
-                "analysis_explanation": result.analysis_explanation,
-                "recognition_metadata": result.recognition_metadata,
-            }
-            for result in analyzer_results
-        ],
-    }
+    output = Formatter().format_output(analyzer_results, text, image)
     print(json.dumps(output, indent=2))
     return analyzer_results
 
@@ -106,6 +107,7 @@ def main():
         "analyze", description="Analyze inputs and return PII detection results"
     )
     analyzer_parser.add_argument("--csv", action="store_true")
+    analyzer_parser.add_argument("--img", action="store_true")
     analyzer_parser.add_argument("--language", required=False, type=str, default="en")
     analyzer_parser.set_defaults(func=analyze)
 
@@ -131,7 +133,6 @@ def main():
 
     args = parser.parse_args()
     args.func(args)
-
 
 if __name__ == "__main__":
     main()
