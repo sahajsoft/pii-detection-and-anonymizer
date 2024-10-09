@@ -4,7 +4,9 @@ This is a python app to detect and anonymise PII data using Named Entity Recogni
 
 ## Getting Started
 
-You can use docker to install the app:
+You can use docker to install the app (follow instructions
+[here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry)
+to authenticate):
 
 ```sh
 docker pull ghcr.io/sahajsoft/pii
