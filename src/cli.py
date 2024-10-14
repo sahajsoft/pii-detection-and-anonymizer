@@ -7,7 +7,7 @@ from presidio_anonymizer.entities.engine.result.operator_result import OperatorR
 from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
 from config.nlp_engine_config import FlairNLPEngine
-from operators.vault import Vault
+from presidio_vault.vault import Vault
 import sys
 import logging
 

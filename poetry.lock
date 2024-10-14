@@ -43,6 +43,25 @@ files = [
 ]
 
 [[package]]
+name = "azure-core"
+version = "1.31.0"
+description = "Microsoft Azure Core Library for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "azure_core-1.31.0-py3-none-any.whl", hash = "sha256:22954de3777e0250029360ef31d80448ef1be13b80a459bff80ba7073379e2cd"},
+    {file = "azure_core-1.31.0.tar.gz", hash = "sha256:656a0dd61e1869b1506b7c6a3b31d62f15984b1a573d6326f6aa2f3e4123284b"},
+]
+
+[package.dependencies]
+requests = ">=2.21.0"
+six = ">=1.11.0"
+typing-extensions = ">=4.6.0"
+
+[package.extras]
+aio = ["aiohttp (>=3.0)"]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.3"
 description = "Screen-scraping library"
@@ -2086,16 +2105,35 @@ transformers = ["spacy-huggingface-pipelines"]
 
 [[package]]
 name = "presidio-anonymizer"
-version = "2.2.354"
-description = "Persidio Anonymizer package - replaces analyzed text with desired values."
+version = "2.2.355"
+description = "Presidio Anonymizer package - replaces analyzed text with desired values."
 optional = false
-python-versions = ">=3.5"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "presidio_anonymizer-2.2.354-py3-none-any.whl", hash = "sha256:2b44bfedf376aa0c21f463581bede543a632c23ac6bc427a2e026c8e81ecfa67"},
+    {file = "presidio_anonymizer-2.2.355-py3-none-any.whl", hash = "sha256:c85f5f155fcb66aff8e962fcf3984552a5512ab34bb1a433b1a52193e635c23f"},
 ]
 
 [package.dependencies]
+azure-core = "*"
 pycryptodome = ">=3.10.1"
+
+[package.extras]
+server = ["flask (>=1.1)"]
+
+[[package]]
+name = "presidio-vault"
+version = "0.1.0"
+description = "A HashiCorp Vault operator that allows anonymization and de-anonymization using Microsoft Presidio."
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "presidio_vault-0.1.0-py3-none-any.whl", hash = "sha256:1ebcd8797ad93dd9dde1f00ccf4df8c8e10d7ba670c573c3c9421755b783c9a2"},
+    {file = "presidio_vault-0.1.0.tar.gz", hash = "sha256:6eb2a974be4ee87fe04265937a1633a7d42574bdda56f85c5ce338a543531303"},
+]
+
+[package.dependencies]
+hvac = ">=2.3.0,<3.0.0"
+presidio-anonymizer = ">=2.2.355,<3.0.0"
 
 [[package]]
 name = "protobuf"
@@ -2324,13 +2362,13 @@ files = [
 
 [[package]]
 name = "pytest"
-version = "8.2.1"
+version = "8.3.3"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.2.1-py3-none-any.whl", hash = "sha256:faccc5d332b8c3719f40283d0d44aa5cf101cec36f88cde9ed8f2bc0538612b1"},
-    {file = "pytest-8.2.1.tar.gz", hash = "sha256:5046e5b46d8e4cac199c373041f26be56fdb81eb4e67dc11d4e10811fc3408fd"},
+    {file = "pytest-8.3.3-py3-none-any.whl", hash = "sha256:a6853c7375b2663155079443d2e45de913a911a11d669df02a50814944db57b2"},
+    {file = "pytest-8.3.3.tar.gz", hash = "sha256:70b98107bd648308a7952b06e6ca9a50bc660be218d53c257cc1fc94fda10181"},
 ]
 
 [package.dependencies]
@@ -2338,7 +2376,7 @@ colorama = {version = "*", markers = "sys_platform == \"win32\""}
 exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
 iniconfig = "*"
 packaging = "*"
-pluggy = ">=1.5,<2.0"
+pluggy = ">=1.5,<2"
 tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 
 [package.extras]
@@ -3827,4 +3865,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "54b51113397da4c81a5c3878e89ca5ed3abfe6d2be277f9edcdb139f7934ec28"
+content-hash = "74b33179297552cef1304d8587cd11c40b7f59a43ea6971ca7ddf44b6e1f22af"
