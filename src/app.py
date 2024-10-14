@@ -146,27 +146,6 @@ class Server:
                 )
                 return jsonify(error=e.args[0]), 500
 
-        @self.app.route("/deanonymize", methods=["POST"])
-        def deanonymize() -> Response:
-            """Execute the deanonymizer function."""
-            try:
-                file = request.files['file']
-                if file.filename == '':
-                    return jsonify({'error': 'No selected file'}), 400
-
-                filepath = f'{UPLOAD_DIR}/{uuid.uuid4()}'
-                file.save(filepath)
-                self.logger.info(f"Successfully saved file: {filepath}")
-
-                anonymizer_results = json.loads(request.form['anonymizer_results'])
-                return jsonify(anonymizer_results)
-            except Exception as e:
-                self.logger.error(
-                    f"A fatal error occurred during execution of "
-                    f"deanonymize. {e}"
-                )
-                return jsonify(error=e.args[0]), 500
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", DEFAULT_PORT))

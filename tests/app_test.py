@@ -132,21 +132,3 @@ def test_vault_anonymize_csv_pii(client):
             "./tests/sample_data/vault_encrypted.csv", "r"
         ).read()
         assert anonymizer_data.replace("\r", "") == expected_anonymized_data
-
-def test_vault_deanonymize_csv(client):
-    with mock.patch.object(hvac, "Client"):
-        expected_plain_text = "text"
-        fake_client = mock.MagicMock()
-        fake_client.secrets.transit.decrypt_data.return_value = {"data": {"plaintext": expected_plain_text}}
-        hvac.Client.return_value = fake_client
-
-        deanonymizer_response = client.post("/deanonymize", data={
-            "file": open('./tests/sample_data/vault_encrypted.csv', 'rb'),
-            "vault_config": '{"url": "http://127.0.0.1:8200", "key": "foobar"}',
-            "anonymizer_results": '{}'
-        })
-
-        assert deanonymizer_response.status_code == 200
-        deanonymizer_data = deanonymizer_response.get_data(as_text=True)
-        expected_deanonymized_data = open('./tests/sample_data/sample_data.csv', 'r').read()
-        assert deanonymizer_data.replace("\r", "") == expected_deanonymized_data
