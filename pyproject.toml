@@ -5,6 +5,7 @@ description = ""
 authors = ["Akshay Karle <1443108+akshaykarle@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -18,7 +19,6 @@ flask = "^3.0.3"
 black = "^24.8.0"
 presidio-vault = "^0.1.0"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -28,3 +28,6 @@ pythonpath = "src"
 addopts = [
     "--import-mode=importlib",
 ]
+
+[tool.poetry.scripts]
+cli = "src.cli:main"
