@@ -30,6 +30,8 @@
           ftfy = [ "hatchling" ];
           segtok = [ "setuptools" ];
           wikipedia-api = [ "setuptools" ];
+          presidio-vault = [ "poetry" ];
+          safetensors = [ "maturin" ];
         };
         p2n-overrides = pkgs.poetry2nix.defaultPoetryOverrides.extend (
           final: prev:
@@ -49,7 +51,7 @@
           poetry2nix.mkPoetryApplication {
             projectDir = self;
             overrides = p2n-overrides;
-            preferWheels = false;
+            preferWheels = true;
           };
         pkgs = import nixpkgs {
           inherit system;
@@ -61,6 +63,12 @@
       in
       {
         packages.default = pkgs.myapp;
+
+        apps.default = {
+          type = "app";
+          program = "${pkgs.myapp}/bin/cli";
+        };
+
         devShells = {
           # Shell for app dependencies.
           #
