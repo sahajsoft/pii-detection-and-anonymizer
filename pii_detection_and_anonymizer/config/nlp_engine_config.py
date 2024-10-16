@@ -1,7 +1,8 @@
-from recognizer.flair_recognizer import FlairRecognizer
 from presidio_analyzer import RecognizerRegistry
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 import spacy
+
+from pii_detection_and_anonymizer.recognizer.flair_recognizer import FlairRecognizer
 
 
 class NLPEngineConfig:
