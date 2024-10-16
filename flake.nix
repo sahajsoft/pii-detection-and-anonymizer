@@ -1,53 +1,82 @@
 {
+  description = "Application packaged using poetry2nix";
+
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05-small";
     poetry2nix = {
       url = "github:nix-community/poetry2nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      poetry2nix,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
+
+        pypkgs-build-requirements = {
+          conllu = [ "setuptools" ];
+          janome = [ "setuptools" ];
+          pptree = [ "setuptools" ];
+          confection = [ "setuptools" ];
+          ftfy = [ "hatchling" ];
+          segtok = [ "setuptools" ];
+          wikipedia-api = [ "setuptools" ];
+        };
+        p2n-overrides = pkgs.poetry2nix.defaultPoetryOverrides.extend (
+          final: prev:
+          builtins.mapAttrs (
+            package: build-requirements:
+            (builtins.getAttr package prev).overridePythonAttrs (old: {
+              buildInputs =
+                (old.buildInputs or [ ])
+                ++ (builtins.map (
+                  pkg: if builtins.isString pkg then builtins.getAttr pkg prev else pkg
+                ) build-requirements);
+            })
+          ) pypkgs-build-requirements
+        );
+        myapp =
+          { poetry2nix, lib }:
+          poetry2nix.mkPoetryApplication {
+            projectDir = self;
+            overrides = p2n-overrides;
+            preferWheels = false;
+          };
         pkgs = import nixpkgs {
           inherit system;
-          config.allowUnfree = true; # needed for vault
+          overlays = [
+            poetry2nix.overlays.default
+            (final: _: { myapp = final.callPackage myapp { }; })
+          ];
         };
-        nativeBuildInputs = with pkgs; [
-          stdenv
-          python311
-          poetry
-          zlib
-          tesseract
-        ];
-        buildInputs = with pkgs; [ vault jq ];
-
-        # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
-        inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; })
-          mkPoetryApplication;
-      in {
-        inherit nativeBuildInputs buildInputs;
-
-        packages = {
-          myapp = mkPoetryApplication {
-            projectDir = self;
-            python = pkgs.python311;
-          };
-          default = self.packages.${system}.myapp;
-        };
-
+      in
+      {
+        packages.default = pkgs.myapp;
         devShells = {
-          default = pkgs.mkShell {
-            packages = nativeBuildInputs ++ buildInputs;
-            LD_LIBRARY_PATH = if pkgs.stdenv.isLinux then
-              "${
-                pkgs.lib.makeLibraryPath nativeBuildInputs
-              }:${pkgs.stdenv.cc.cc.lib}/lib:/run/opengl-driver/lib:/run/opengl-driver-32/lib"
-            else
-              "$LD_LIBRARY_PATH";
-          };
+          # Shell for app dependencies.
+          #
+          #     nix develop
+          #
+          # Use this shell for developing your app.
+          default = pkgs.mkShell { inputsFrom = [ pkgs.myapp ]; };
+
+          # Shell for poetry.
+          #
+          #     nix develop .#poetry
+          #
+          # Use this shell for changes to pyproject.toml and poetry.lock.
+          poetry = pkgs.mkShell { packages = [ pkgs.poetry ]; };
         };
-      });
+        legacyPackages = pkgs;
+      }
+    );
 }
