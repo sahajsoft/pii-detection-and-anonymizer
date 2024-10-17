@@ -26,12 +26,12 @@ To run the CLI locally, run any of the following commands:
 
 ```sh
 # alias for easier calls
-alias pii='poetry run python src/cli.py'
+alias pii='poetry run python -m pii_detection_and_anonymizer'
 # alias for docker
 alias pii=docker run --rm -i ghcr.io/sahajsoft/pii
 
 # text
-echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze 
+echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze | pii anonymize
 
 # text files
