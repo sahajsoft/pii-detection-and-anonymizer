@@ -1,11 +1,11 @@
-from typing import Any
-from presidio_analyzer import RecognizerResult
-import pytest
 import json
+from typing import Any
+import pytest
 from unittest import mock
 
+from presidio_analyzer import RecognizerResult
 import hvac
-from app import Server
+from pii_detection_and_anonymizer.app import Server
 
 
 @pytest.fixture()

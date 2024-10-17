@@ -1,7 +1,8 @@
-from recognizer.flair_recognizer import FlairRecognizer
 from presidio_analyzer import RecognizerRegistry
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 import spacy
+
+from pii_detection_and_anonymizer.recognizer.flair_recognizer import FlairRecognizer
 
 
 class NLPEngineConfig:
@@ -22,8 +23,6 @@ class FlairNLPEngine(NLPEngineConfig):
         """
         registry = RecognizerRegistry()
         registry.load_predefined_recognizers()
-        if not spacy.util.is_package("en_core_web_sm"):
-            spacy.cli.download("en_core_web_sm")
         flair_recognizer = FlairRecognizer(model_path=self.model_path)
         nlp_configuration = {
             "nlp_engine_name": "spacy",

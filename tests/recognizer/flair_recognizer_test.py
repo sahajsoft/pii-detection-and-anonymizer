@@ -1,6 +1,6 @@
 import pytest
 
-from recognizer.flair_recognizer import FlairRecognizer
+from pii_detection_and_anonymizer.recognizer.flair_recognizer import FlairRecognizer
 
 
 def test_flair_recognizer_analyze():

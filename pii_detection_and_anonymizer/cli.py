@@ -1,15 +1,17 @@
 import argparse
 import json
+import logging
+import sys
 
 from presidio_analyzer import RecognizerResult
 from presidio_analyzer.analyzer_engine import AnalyzerEngine
 from presidio_anonymizer.entities.engine.result.operator_result import OperatorResult
-from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
-from config.nlp_engine_config import FlairNLPEngine
 from presidio_vault.vault import Vault
-import sys
-import logging
+
+from pii_detection_and_anonymizer.analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
+from pii_detection_and_anonymizer.config.nlp_engine_config import FlairNLPEngine
+
 
 NLP_ENGINE = "flair/ner-english-large"
 
@@ -131,7 +133,3 @@ def main():
 
     args = parser.parse_args()
     args.func(args)
-
-
-if __name__ == "__main__":
-    main()

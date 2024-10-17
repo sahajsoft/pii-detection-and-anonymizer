@@ -26,12 +26,12 @@ To run the CLI locally, run any of the following commands:
 
 ```sh
 # alias for easier calls
-alias pii='poetry run python src/cli.py'
+alias pii='poetry run python -m pii_detection_and_anonymizer'
 # alias for docker
 alias pii=docker run --rm -i ghcr.io/sahajsoft/pii
 
 # text
-echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze 
+echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii analyze | pii anonymize
 
 # text files
@@ -49,6 +49,7 @@ cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text'
 cat sample.csv | pii analyze --csv | pii anonymize | jq -r '.text' > anonymized.csv
 
 # vault integration
+# NOTE: this won't work from docker unless you mount ports from the vault server into docker. Make sure you run either do that or run using poetry
 ./vault.sh # start and configure vault server and transit secret engine keys
 echo "My name is Don Stark and my phone number is 212-555-5555" | pii anonymize --vaulturl "http://127.0.0.1:8200" --vaultkey "orders"
 
@@ -68,6 +69,8 @@ pii --help
 Run `./setup.sh` to install all dependencies. This will install [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) and [nix](https://nixos.org/download.html) then simply run `direnv allow` to install all build dependencies.
 
 Alternatively, make sure you have [python 3.11](https://www.python.org/downloads/) and [poetry](https://python-poetry.org/docs/#installation) setup on your machine.
+
+Install [vault](https://developer.hashicorp.com/vault/install) if you are planning to use vault for anonymization/deanonymization.
 
 ### Running the app
 

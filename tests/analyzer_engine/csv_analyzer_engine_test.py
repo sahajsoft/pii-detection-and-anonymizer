@@ -2,8 +2,8 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 import pytest
 
-from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
-from config.nlp_engine_config import FlairNLPEngine
+from pii_detection_and_anonymizer.analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
+from pii_detection_and_anonymizer.config.nlp_engine_config import FlairNLPEngine
 
 
 def test_csv_analyzer_engine_anonymizer():

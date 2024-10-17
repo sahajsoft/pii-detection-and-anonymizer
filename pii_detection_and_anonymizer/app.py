@@ -3,15 +3,15 @@ import logging
 import os
 import uuid
 from typing import Tuple
+import csv
 
 from flask import Flask, request, jsonify, Response, send_file
-
-import csv
-from analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
 from presidio_analyzer import AnalyzerEngine, DictAnalyzerResult, RecognizerResult
 from presidio_anonymizer import AnonymizerEngine, BatchAnonymizerEngine
-from config.nlp_engine_config import FlairNLPEngine
 from presidio_vault.vault import Vault
+
+from pii_detection_and_anonymizer.analyzer_engine.csv_analyzer_engine import CSVAnalyzerEngine
+from pii_detection_and_anonymizer.config.nlp_engine_config import FlairNLPEngine
 
 DEFAULT_PORT = "3000"
 NLP_ENGINE = "flair/ner-english-large"

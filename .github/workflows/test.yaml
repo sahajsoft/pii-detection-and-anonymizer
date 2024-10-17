@@ -1,4 +1,4 @@
-name: "Test and Build"
+name: Test
 
 on:
   push:
@@ -9,30 +9,16 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: "write"
+      contents: "read"
     steps:
-    - uses: actions/checkout@v4
-
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
-    - name: "Setup poetry"
-      uses: abatilo/actions-poetry@v2
-
-    - name: "Load cached venv"
-      id: cached-poetry-dependencies
-      uses: actions/cache@v4
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}-${{ hashFiles('**/poetry.lock') }}
-
-    - name: "Install python dependencies"
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
-      shell: bash
-
-    - name: "Test"
-      run: 'poetry run pytest'
-      shell: bash
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: DeterminateSystems/flake-checker-action@main
+      - name: Run tests
+        run: pytest
+        shell: nix develop --command bash -e {0}
