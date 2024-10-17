@@ -16,6 +16,7 @@ jobs:
       contents: "read"
     steps:
       - name: Remove software and languages
+        # copied from: https://github.com/actions/runner-images/issues/2840#issuecomment-2327466240
         shell: bash
         run: |
           df -h /
