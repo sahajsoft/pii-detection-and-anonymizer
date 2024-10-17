@@ -55,6 +55,7 @@
           };
         pkgs = import nixpkgs {
           inherit system;
+          config.allowUnfree = true;
           overlays = [
             poetry2nix.overlays.default
             (final: _: { myapp = final.callPackage myapp { }; })
@@ -75,7 +76,13 @@
           #     nix develop
           #
           # Use this shell for developing your app.
-          default = pkgs.mkShell { inputsFrom = [ pkgs.myapp ]; };
+          default = pkgs.mkShell {
+            inputsFrom = [ pkgs.myapp ];
+            packages = [
+              pkgs.vault
+              pkgs.jq
+            ];
+          };
 
           # Shell for poetry.
           #
