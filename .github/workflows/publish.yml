@@ -62,7 +62,7 @@ jobs:
         id: push
         run: |
           docker load --input result
-          docker tag pii:latest
+          docker tag pii:latest ${{ format('{0}/{1}:latest', env.REGISTRY, env.IMAGE_NAME) }}
           docker push ${{ format('{0}/{1}:latest', env.REGISTRY, env.IMAGE_NAME) }}
-          docker tag pii:${{ steps.meta.outputs.tags }}
+          docker tag pii:latest ${{ format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, steps.meta.outputs.tags) }}
           docker push ${{ format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, steps.meta.outputs.tags) }}
