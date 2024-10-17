@@ -61,9 +61,18 @@
             (final: _: { myapp = final.callPackage myapp { }; })
           ];
         };
+        # build docker using nix to have smaller images. Inspiration from
+        # https://lucabrunox.github.io/2016/04/cheap-docker-images-with-nix_15.html
+        buildImage = pkgs.dockerTools.buildLayeredImage {
+          name = "pii";
+          tag = "latest";
+          created = "now";
+          config.Entrypoint = [ "${pkgs.myapp}/bin/cli" ];
+        };
       in
       {
         packages.default = pkgs.myapp;
+        packages.dockerImage = buildImage;
 
         apps.default = {
           type = "app";
@@ -79,8 +88,9 @@
           default = pkgs.mkShell {
             inputsFrom = [ pkgs.myapp ];
             packages = [
-              pkgs.vault
+              pkgs.docker
               pkgs.jq
+              pkgs.vault
             ];
           };
 
